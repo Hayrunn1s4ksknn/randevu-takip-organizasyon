@@ -8,7 +8,7 @@ export default async function ReportsPage() {
   ])
 
   return (
-    <div className="grid animate-fade-in grid-cols-2 gap-4">
+    <div className="grid animate-fade-in grid-cols-1 gap-4 lg:grid-cols-2">
       <div className="rounded-2xl border border-border bg-surface-solid p-[22px]">
         <div className="mb-4 text-[14.5px] font-bold">En Aktif Kurumlar</div>
         {topOrgs.length === 0 ? (

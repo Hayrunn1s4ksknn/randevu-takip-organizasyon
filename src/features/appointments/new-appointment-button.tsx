@@ -7,7 +7,7 @@ export function NewAppointmentButton() {
   return (
     <button
       onClick={() => openModal('appointment')}
-      className="rounded-[9px] bg-primary px-4 py-[9px] text-[12.5px] font-bold text-white"
+      className="hidden rounded-[9px] bg-primary px-4 py-[9px] text-[12.5px] font-bold text-white md:inline-flex"
     >
       + Yeni Randevu
     </button>

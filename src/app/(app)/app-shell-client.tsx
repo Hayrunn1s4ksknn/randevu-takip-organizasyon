@@ -8,6 +8,8 @@ import { QuickActionModals } from '@/components/quick-action-modals'
 import { AppointmentDrawer } from '@/features/appointments/appointment-drawer'
 import { ContactDrawer } from '@/features/contacts/contact-drawer'
 import { OrganizationDrawer } from '@/features/organizations/organization-drawer'
+import { BottomNav } from '@/components/bottom-nav'
+import { Fab } from '@/components/fab'
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -36,13 +38,15 @@ export function AppShellClient({
   return (
     <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
       <Topbar pageTitle={pageTitle} isDark={isDark} fullName={fullName} />
-      <div className="relative flex-1 overflow-auto p-7">{children}</div>
+      <div className="relative flex-1 overflow-auto p-4 pb-20 md:p-7">{children}</div>
       <SearchPalette />
       <ToastContainer />
       <QuickActionModals orgOptions={orgOptions} />
       <AppointmentDrawer />
       <ContactDrawer orgOptions={orgOptions} />
       <OrganizationDrawer />
+      <BottomNav />
+      <Fab />
     </div>
   )
 }

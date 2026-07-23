@@ -26,6 +26,10 @@ interface UiState {
   openOrgDrawer: (id: number) => void
   closeOrgDrawer: () => void
 
+  mobileNavOpen: boolean
+  openMobileNav: () => void
+  closeMobileNav: () => void
+
   toasts: Toast[]
   showToast: (message: string) => void
   dismissToast: (id: number) => void
@@ -54,6 +58,10 @@ export const useUiStore = create<UiState>((set) => ({
   orgDrawerId: null,
   openOrgDrawer: (id) => set({ orgDrawerId: id }),
   closeOrgDrawer: () => set({ orgDrawerId: null }),
+
+  mobileNavOpen: false,
+  openMobileNav: () => set({ mobileNavOpen: true }),
+  closeMobileNav: () => set({ mobileNavOpen: false }),
 
   toasts: [],
   showToast: (message) => {

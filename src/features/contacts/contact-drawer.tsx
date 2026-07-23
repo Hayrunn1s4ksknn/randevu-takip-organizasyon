@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { useUiStore } from '@/store/ui'
+import { useSwipeToClose } from '@/hooks/use-swipe-to-close'
 import { Modal } from '@/components/modal'
 import { EditContactForm } from './edit-contact-form'
 import { STATUS_STYLE } from '@/lib/status-styles'
@@ -30,6 +31,7 @@ export function ContactDrawer({ orgOptions }: { orgOptions: { id: number; name: 
   const editTargetId = useUiStore((s) => s.editTargetId)
   const openModal = useUiStore((s) => s.openModal)
   const closeModal = useUiStore((s) => s.closeModal)
+  const swipeHandlers = useSwipeToClose(closeContactDrawer)
 
   const { data } = useQuery<ContactDetail>({
     queryKey: ['contact-detail', contactDrawerId],
@@ -53,9 +55,14 @@ export function ContactDrawer({ orgOptions }: { orgOptions: { id: number; name: 
   return (
     <>
       <div onClick={closeContactDrawer} className="fixed inset-0 z-40 bg-black/35" />
-      <div className="animate-slide-in fixed right-0 top-0 z-[41] flex h-full w-[400px] max-w-[92vw] flex-col overflow-auto bg-surface-solid p-6 shadow-2xl">
+      <div
+        {...swipeHandlers}
+        className="animate-slide-in fixed right-0 top-0 z-[41] flex h-full w-[400px] max-w-[92vw] flex-col overflow-auto bg-surface-solid p-6 shadow-2xl"
+      >
         <div className="text-right text-xl leading-none text-text-secondary">
-          <button onClick={closeContactDrawer}>×</button>
+          <button onClick={closeContactDrawer} className="flex h-11 w-11 items-center justify-center">
+            ×
+          </button>
         </div>
         {!c && <p className="mt-4 text-[13px] text-text-secondary">Yükleniyor...</p>}
         {c && (

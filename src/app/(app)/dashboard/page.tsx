@@ -37,7 +37,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Hero stats */}
-      <div className="mb-5 grid grid-cols-4 gap-4">
+      <div className="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {data.heroStats.map((hs) => (
           <div key={hs.label} className="rounded-2xl border border-border bg-surface-solid p-[18px] px-5">
             <div className="text-[12.5px] font-semibold text-text-secondary">{hs.label}</div>
@@ -50,7 +50,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Widgets */}
-      <div className="mb-5 grid grid-cols-4 gap-4">
+      <div className="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {data.widgets.map((w) => (
           <div
             key={w.label}
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Monthly chart + status donut */}
-      <div className="mb-5 grid grid-cols-[1.3fr_1fr] gap-4">
+      <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-[1.3fr_1fr]">
         <div className="rounded-2xl border border-border bg-surface-solid p-[22px]">
           <div className="mb-4 text-[14.5px] font-bold">Aylık Randevu Grafiği</div>
           <div className="flex h-[150px] items-end gap-2">
@@ -100,7 +100,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Org distribution + heatmap */}
-      <div className="mb-5 grid grid-cols-2 gap-4">
+      <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-border bg-surface-solid p-[22px]">
           <div className="mb-4 text-[14.5px] font-bold">Kurumlara Göre Dağılım</div>
           <div className="flex flex-col gap-3">

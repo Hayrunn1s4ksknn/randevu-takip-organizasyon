@@ -37,7 +37,7 @@ export default async function CalendarPage({
 
   return (
     <div className="animate-fade-in">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2.5">
         <MonthNav label={monthLabel(year, month)} monthOffset={monthOffset} view={view} day={day} />
         <CalendarViewTabs view={view} monthOffset={monthOffset} day={day} />
       </div>

@@ -4,6 +4,7 @@ import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { useUiStore } from '@/store/ui'
+import { useSwipeToClose } from '@/hooks/use-swipe-to-close'
 import { Modal } from '@/components/modal'
 import { EditOrganizationForm } from './edit-organization-form'
 import { softDeleteOrganization } from './actions'
@@ -35,6 +36,7 @@ export function OrganizationDrawer() {
   const showToast = useUiStore((s) => s.showToast)
   const router = useRouter()
   const [pending, startTransition] = useTransition()
+  const swipeHandlers = useSwipeToClose(closeOrgDrawer)
 
   const { data } = useQuery<OrgDetail>({
     queryKey: ['organization-detail', orgDrawerId],
@@ -63,9 +65,14 @@ export function OrganizationDrawer() {
   return (
     <>
       <div onClick={closeOrgDrawer} className="fixed inset-0 z-40 bg-black/35" />
-      <div className="animate-slide-in fixed right-0 top-0 z-[41] flex h-full w-[420px] max-w-[92vw] flex-col overflow-auto bg-surface-solid p-6 shadow-2xl">
+      <div
+        {...swipeHandlers}
+        className="animate-slide-in fixed right-0 top-0 z-[41] flex h-full w-[420px] max-w-[92vw] flex-col overflow-auto bg-surface-solid p-6 shadow-2xl"
+      >
         <div className="text-right text-xl leading-none text-text-secondary">
-          <button onClick={closeOrgDrawer}>×</button>
+          <button onClick={closeOrgDrawer} className="flex h-11 w-11 items-center justify-center">
+            ×
+          </button>
         </div>
         {!o && <p className="mt-4 text-[13px] text-text-secondary">Yükleniyor...</p>}
         {o && (

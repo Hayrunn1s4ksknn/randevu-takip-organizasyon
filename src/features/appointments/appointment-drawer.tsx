@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useUiStore } from '@/store/ui'
+import { useSwipeToClose } from '@/hooks/use-swipe-to-close'
 import { STATUS_STYLE } from '@/lib/status-styles'
 import type { AppointmentStatus } from '@/types/database'
 
@@ -79,6 +80,7 @@ export function AppointmentDrawer() {
   const closeDrawer = useUiStore((s) => s.closeDrawer)
   const [tab, setTab] = useState<TabKey>('notlar')
   const queryClient = useQueryClient()
+  const swipeHandlers = useSwipeToClose(closeDrawer)
 
   const { data } = useQuery<DrawerData>({
     queryKey: ['appointment-detail', drawerApptId],
@@ -99,7 +101,10 @@ export function AppointmentDrawer() {
   return (
     <>
       <div onClick={closeDrawer} className="fixed inset-0 z-40 bg-black/35" />
-      <div className="animate-slide-in fixed right-0 top-0 z-[41] flex h-full w-[440px] max-w-[92vw] flex-col bg-surface-solid shadow-2xl">
+      <div
+        {...swipeHandlers}
+        className="animate-slide-in fixed right-0 top-0 z-[41] flex h-full w-[440px] max-w-[92vw] flex-col bg-surface-solid shadow-2xl"
+      >
         <div className="flex items-start justify-between border-b border-border p-6">
           <div>
             <div className="text-[17px] font-bold">{a?.title ?? '...'}</div>
@@ -119,7 +124,10 @@ export function AppointmentDrawer() {
               </span>
             )}
           </div>
-          <button onClick={closeDrawer} className="text-xl leading-none text-text-secondary">
+          <button
+            onClick={closeDrawer}
+            className="flex h-11 w-11 items-center justify-center text-xl leading-none text-text-secondary"
+          >
             ×
           </button>
         </div>
