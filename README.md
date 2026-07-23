@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Randevu Takip ve Organizasyon Sistemi
 
-## Getting Started
+Kurumsal Randevu Takip ve Organizasyon Sistemi — Next.js + Supabase ile üretim seviyesinde bir SaaS uygulaması. `design/Randevu Paneli.dc.html` tasarım prototipinin gerçek, veritabanı destekli bir uygulamaya dönüştürülmüş hali.
 
-First, run the development server:
+## Teknolojiler
+
+- Next.js 16 (App Router) + TypeScript (strict)
+- Tailwind CSS v4
+- Supabase (Auth + Postgres + RLS)
+- TanStack Query, React Hook Form + Zod, Zustand
+- Vitest + Testing Library (unit), Playwright (E2E)
+- GitHub Actions (lint + typecheck + test + build + e2e)
+
+## Kurulum
 
 ```bash
+npm install
+cp .env.local.example .env.local   # değerleri Supabase Dashboard → Settings → API'den al
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`http://localhost:3000` adresi otomatik olarak `/dashboard` veya `/login`'e yönlendirir.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Supabase şemasını uygulama
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Bkz. [`supabase/README.md`](./supabase/README.md) — migration dosyalarını CLI veya Dashboard SQL Editor ile uygulama adımları.
 
-## Learn More
+## Komutlar
 
-To learn more about Next.js, take a look at the following resources:
+| Komut               | Açıklama                   |
+| ------------------- | -------------------------- |
+| `npm run dev`       | Geliştirme sunucusu        |
+| `npm run build`     | Prodüksiyon build          |
+| `npm run lint`      | ESLint                     |
+| `npm run typecheck` | TypeScript tip kontrolü    |
+| `npm test`          | Vitest unit testleri       |
+| `npm run test:e2e`  | Playwright E2E testleri    |
+| `npm run format`    | Prettier ile biçimlendirme |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Faz Durumu
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Faz 1 (bu sürüm):** Auth (email/şifre, remember me, forgot/reset), RLS ile korunan Supabase şeması (profiles/organizations/contacts/appointments/tasks/activities + ilişkili tablolar), Dashboard ve Randevular modülleri gerçek veriyle çalışıyor; dark mode tercihi `profiles.dark_mode`'a kaydediliyor.
 
-## Deploy on Vercel
+**Faz 2+ (planlanan):** Kişiler/Kurumlar/Takvim/Raporlar tam CRUD arayüzleri, Supabase Storage ile dosya yükleme, mail entegrasyonu, Supabase Realtime bildirimleri, Excel/PDF export, 2FA, AI özellikleri.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Dizin Yapısı
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+  app/            → route'lar ((auth) ve (app) route grupları, proxy.ts session yönetimi)
+  components/     → paylaşılan UI bileşenleri
+  features/       → modül bazlı client bileşenler + server action'lar
+  services/       → Supabase'e giden server-only veri erişim fonksiyonları
+  lib/            → supabase client factory'leri, ortak yardımcılar
+  store/          → zustand (yalnızca UI-local state)
+  types/          → Supabase Database tipi
+supabase/
+  migrations/     → şema, RLS, trigger'lar
+  seed.sql        → geliştirme için örnek veri
+```

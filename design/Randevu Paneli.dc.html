@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
+  @keyframes slideIn { from { transform:translateX(24px); opacity:0;} to { transform:translateX(0); opacity:1;} }
+  body { margin:0; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:rgba(148,163,184,0.4); border-radius:8px; }
+  a { color:#2563EB; text-decoration:none; }
+  a:hover { color:#1E3A8A; }
+  input, select { font-family:inherit; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</helmet>
+
+<div style="display:flex;height:100vh;width:100%;background:{{c.bg}};color:{{c.textPrimary}};transition:background .25s,color .25s;overflow:hidden">
+
+  <!-- SIDEBAR -->
+  <div style="width:248px;flex-shrink:0;background:{{c.sidebarBg}};display:flex;flex-direction:column;padding:20px 14px;box-sizing:border-box">
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 10px 22px 10px">
+      <div style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0">RP</div>
+      <div>
+        <div style="font-size:10px;letter-spacing:1.2px;color:rgba(255,255,255,0.5);font-weight:600">MERSİN TEKNOPARK</div>
+        <div style="font-size:14px;font-weight:700;color:#fff;letter-spacing:0.3px">RANDEVU PANELİ</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px;margin-top:8px">
+      <sc-for list="{{navItems}}" as="item" hint-placeholder-count="7">
+        <div onClick="{{item.onClick}}" style="{{item.rowStyle}}" style-hover="background:rgba(255,255,255,0.08)">
+          <div style="{{item.dotStyle}}"></div>
+          <span style="{{item.labelStyle}}">{{item.label}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top:auto;padding:12px 10px;border-radius:12px;background:rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:#2563EB;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0">NA</div>
+      <div style="min-width:0">
+        <div style="font-size:12.5px;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Nisa Aydın</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5)">Yönetici</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden">
+
+    <!-- TOPBAR -->
+    <div style="height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid {{c.border}};background:{{c.surfaceSolid}}">
+      <div style="display:flex;align-items:center;gap:14px;min-width:0">
+        <div style="font-size:16px;font-weight:700">{{pageTitle}}</div>
+        <div onClick="{{openSearch}}" style="display:flex;align-items:center;gap:8px;background:{{c.bg}};border:1px solid {{c.border}};border-radius:9px;padding:7px 12px;cursor:pointer;color:{{c.textSecondary}};font-size:13px;width:260px" style-hover="border-color:{{c.accent}}">
+          <span>Ara...</span>
+          <span style="margin-left:auto;font-size:11px;background:{{c.surface}};padding:2px 6px;border-radius:5px;border:1px solid {{c.border}}">⌘K</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
+        <div onClick="{{toggleDark}}" style="width:38px;height:38px;border-radius:9px;background:{{c.bg}};border:1px solid {{c.border}};display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px" title="Tema değiştir">{{themeIcon}}</div>
+        <div style="position:relative;width:38px;height:38px;border-radius:9px;background:{{c.bg}};border:1px solid {{c.border}};display:flex;align-items:center;justify-content:center;cursor:pointer" title="Bildirimler">
+          <span style="font-size:15px">🔔</span>
+          <span style="position:absolute;top:-4px;right:-4px;background:{{c.danger}};color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px">3</span>
+        </div>
+        <div style="width:38px;height:38px;border-radius:50%;background:{{c.accent}};display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;cursor:pointer">NA</div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div style="flex:1;overflow:auto;padding:28px;box-sizing:border-box;position:relative">
+
+      <!-- DASHBOARD -->
+      <sc-if value="{{isDashboard}}" hint-placeholder-val="{{true}}">
+        <div style="animation:fadeIn .3s ease">
+          <div style="border-radius:20px;padding:28px 32px;margin-bottom:22px;background:linear-gradient(135deg,{{c.primary}},{{c.accent}});color:#fff;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:12.5px;opacity:0.75;font-weight:600;letter-spacing:0.4px">{{todayLabel}}</div>
+              <div style="font-size:24px;font-weight:800;margin-top:6px">Hoş geldin, Nisa 👋</div>
+              <div style="font-size:13.5px;opacity:0.85;margin-top:6px;max-width:460px">Bugün {{stats.today}} randevun var. Haftalık tamamlanma oranın %{{stats.completionRate}} — harika gidiyor.</div>
+              <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap">
+                <sc-for list="{{quickActions}}" as="qa" hint-placeholder-count="5">
+                  <div onClick="{{qa.onClick}}" style="background:rgba(255,255,255,0.16);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.25);padding:9px 15px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;transition:transform .15s" style-hover="background:rgba(255,255,255,0.26);transform:translateY(-1px)">{{qa.label}}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="width:132px;height:132px;border-radius:50%;background:conic-gradient(#fff {{stats.completionRate}}%, rgba(255,255,255,0.25) 0);display:flex;align-items:center;justify-content:center;padding:10px;box-sizing:border-box">
+                <div style="width:100%;height:100%;border-radius:50%;background:{{c.primary}};display:flex;flex-direction:column;align-items:center;justify-content:center">
+                  <div style="font-size:26px;font-weight:800">%{{stats.completionRate}}</div>
+                  <div style="font-size:10.5px;opacity:0.8">Performans</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+            <sc-for list="{{heroStats}}" as="hs" hint-placeholder-count="4">
+              <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:18px 20px">
+                <div style="font-size:12.5px;color:{{c.textSecondary}};font-weight:600">{{hs.label}}</div>
+                <div style="font-size:28px;font-weight:800;margin-top:8px">{{hs.value}}</div>
+                <div style="font-size:12px;margin-top:6px;color:{{hs.trendColor}};font-weight:600">{{hs.trend}}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px">
+            <sc-for list="{{widgets}}" as="w" hint-placeholder-count="8">
+              <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:14px;padding:15px 17px">
+                <div style="font-size:11.5px;color:{{c.textSecondary}};font-weight:600">{{w.label}}</div>
+                <div style="font-size:20px;font-weight:800;margin-top:6px">{{w.value}}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px;margin-bottom:20px">
+            <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Aylık Randevu Grafiği</div>
+              <div style="display:flex;align-items:flex-end;gap:8px;height:150px">
+                <sc-for list="{{monthlyData}}" as="m" hint-placeholder-count="12">
+                  <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+                    <div style="width:100%;background:{{c.accent}};border-radius:5px 5px 0 0;height:{{m.heightPct}}" title="{{m.count}}"></div>
+                    <div style="font-size:10px;color:{{c.textSecondary}}">{{m.label}}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Durum Dağılımı</div>
+              <div style="display:flex;align-items:center;gap:20px">
+                <div style="width:110px;height:110px;border-radius:50%;background:{{statusDonutGradient}};flex-shrink:0"></div>
+                <div style="display:flex;flex-direction:column;gap:9px;min-width:0">
+                  <sc-for list="{{statusDist}}" as="s" hint-placeholder-count="4">
+                    <div style="display:flex;align-items:center;gap:8px;font-size:12.5px">
+                      <div style="width:9px;height:9px;border-radius:3px;background:{{s.color}};flex-shrink:0"></div>
+                      <span style="color:{{c.textSecondary}}">{{s.label}}</span>
+                      <span style="margin-left:auto;font-weight:700">{{s.pct}}%</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+            <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Kurumlara Göre Dağılım</div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <sc-for list="{{orgDistribution}}" as="od" hint-placeholder-count="5">
+                  <div>
+                    <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span>{{od.name}}</span><span style="font-weight:700;color:{{c.textSecondary}}">{{od.count}}</span></div>
+                    <div style="height:8px;border-radius:5px;background:{{c.bg}};overflow:hidden"><div style="height:100%;width:{{od.pct}};background:{{c.primary}};border-radius:5px"></div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Saatlere Göre Yoğunluk</div>
+              <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px">
+                <sc-for list="{{heatmap}}" as="hcell" hint-placeholder-count="56">
+                  <div style="aspect-ratio:1;border-radius:4px;background:{{hcell.color}}" title="{{hcell.label}}"></div>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:10.5px;color:{{c.textSecondary}};margin-top:8px"><span>09:00</span><span>21:00</span></div>
+            </div>
+          </div>
+
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Son Aktiviteler</div>
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <sc-for list="{{activities}}" as="act" hint-placeholder-count="5">
+                <div style="display:flex;gap:12px;align-items:flex-start">
+                  <div style="width:34px;height:34px;border-radius:50%;background:{{act.color}};display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0">{{act.initials}}</div>
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:13px"><strong>{{act.who}}</strong> {{act.action}}</div>
+                    <div style="font-size:11.5px;color:{{c.textSecondary}};margin-top:2px">{{act.when}}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- APPOINTMENTS -->
+      <sc-if value="{{isAppointments}}" hint-placeholder-val="{{false}}">
+        <div style="animation:fadeIn .3s ease">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;flex:1">
+              <input value="{{apptSearch}}" onChange="{{onApptSearch}}" placeholder="Randevu, kurum veya kişi ara..." style="flex:1;min-width:220px;padding:10px 14px;border-radius:10px;border:1px solid {{c.border}};background:{{c.surfaceSolid}};color:{{c.textPrimary}};font-size:13px;outline:none" />
+              <select value="{{apptStatusFilter}}" onChange="{{onApptStatus}}" style="padding:10px 12px;border-radius:10px;border:1px solid {{c.border}};background:{{c.surfaceSolid}};color:{{c.textPrimary}};font-size:13px">
+                <option value="all">Tüm Durumlar</option>
+                <option value="Planlandı">Planlandı</option>
+                <option value="Devam Ediyor">Devam Ediyor</option>
+                <option value="Tamamlandı">Tamamlandı</option>
+                <option value="İptal Edildi">İptal Edildi</option>
+              </select>
+              <select value="{{apptOrgFilter}}" onChange="{{onApptOrg}}" style="padding:10px 12px;border-radius:10px;border:1px solid {{c.border}};background:{{c.surfaceSolid}};color:{{c.textPrimary}};font-size:13px">
+                <option value="all">Tüm Kurumlar</option>
+                <sc-for list="{{orgNames}}" as="on" hint-placeholder-count="6">
+                  <option value="{{on}}">{{on}}</option>
+                </sc-for>
+              </select>
+            </div>
+            <div style="display:flex;gap:8px">
+              <div onClick="{{exportAs('Excel')}}" style="padding:9px 14px;border-radius:9px;border:1px solid {{c.border}};background:{{c.surfaceSolid}};font-size:12.5px;font-weight:600;cursor:pointer">Excel</div>
+              <div onClick="{{exportAs('PDF')}}" style="padding:9px 14px;border-radius:9px;border:1px solid {{c.border}};background:{{c.surfaceSolid}};font-size:12.5px;font-weight:600;cursor:pointer">PDF</div>
+              <div onClick="{{exportAs('CSV')}}" style="padding:9px 14px;border-radius:9px;border:1px solid {{c.border}};background:{{c.surfaceSolid}};font-size:12.5px;font-weight:600;cursor:pointer">CSV</div>
+              <div onClick="{{newAppointment}}" style="padding:9px 16px;border-radius:9px;background:{{c.primary}};color:#fff;font-size:12.5px;font-weight:700;cursor:pointer">+ Yeni Randevu</div>
+            </div>
+          </div>
+
+          <sc-if value="{{hasSelection}}" hint-placeholder-val="{{false}}">
+            <div style="display:flex;align-items:center;gap:12px;background:{{c.accentBg}};border:1px solid {{c.accent}};border-radius:10px;padding:10px 16px;margin-bottom:12px;font-size:13px">
+              <span><strong>{{selectedCount}}</strong> randevu seçildi</span>
+              <div onClick="{{bulkComplete}}" style="margin-left:auto;cursor:pointer;font-weight:600;color:{{c.success}}">Tamamlandı yap</div>
+              <div onClick="{{bulkCancel}}" style="cursor:pointer;font-weight:600;color:{{c.danger}}">İptal et</div>
+              <div onClick="{{clearSelection}}" style="cursor:pointer;font-weight:600;color:{{c.textSecondary}}">Vazgeç</div>
+            </div>
+          </sc-if>
+
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:36px 1.6fr 1fr 0.8fr 1fr 1fr 0.9fr;gap:10px;padding:12px 20px;font-size:11.5px;font-weight:700;color:{{c.textSecondary}};border-bottom:1px solid {{c.border}}">
+              <input type="checkbox" checked="{{allOnPageSelected}}" onChange="{{toggleSelectAll}}" />
+              <div>Başlık</div><div>Kurum / Kişi</div><div>Tarih</div><div>Saat</div><div>Öncelik</div><div>Durum</div>
+            </div>
+            <sc-for list="{{pagedAppointments}}" as="a" hint-placeholder-count="5">
+              <div onClick="{{a.onOpen}}" style="display:grid;grid-template-columns:36px 1.6fr 1fr 0.8fr 1fr 1fr 0.9fr;gap:10px;padding:14px 20px;font-size:13px;border-bottom:1px solid {{c.border}};cursor:pointer;align-items:center" style-hover="background:{{c.bg}}">
+                <input type="checkbox" checked="{{a.selected}}" onClick="{{a.onToggleSelect}}" />
+                <div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{a.title}}</div>
+                <div style="color:{{c.textSecondary}};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{a.org}}</div>
+                <div style="color:{{c.textSecondary}}">{{a.dateDisplay}}</div>
+                <div style="color:{{c.textSecondary}}">{{a.time}}</div>
+                <div><span style="padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;background:{{a.priorityBg}};color:{{a.priorityColor}}">{{a.priority}}</span></div>
+                <div><span style="padding:4px 10px;border-radius:7px;font-size:11.5px;font-weight:700;background:{{a.statusBg}};color:{{a.statusColor}}">{{a.status}}</span></div>
+              </div>
+            </sc-for>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 20px;font-size:12.5px;color:{{c.textSecondary}}">
+              <div>{{filteredCount}} sonuçtan {{pageRangeLabel}} gösteriliyor</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div onClick="{{prevPage}}" style="cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid {{c.border}}">‹</div>
+                <div>Sayfa {{apptPage}} / {{totalPages}}</div>
+                <div onClick="{{nextPage}}" style="cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid {{c.border}}">›</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- CONTACTS -->
+      <sc-if value="{{isContacts}}" hint-placeholder-val="{{false}}">
+        <div style="animation:fadeIn .3s ease">
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px;gap:10px">
+            <input value="{{contactSearch}}" onChange="{{onContactSearch}}" placeholder="Kişi ara..." style="flex:1;max-width:320px;padding:10px 14px;border-radius:10px;border:1px solid {{c.border}};background:{{c.surfaceSolid}};color:{{c.textPrimary}};font-size:13px;outline:none" />
+            <div onClick="{{newContact}}" style="padding:9px 16px;border-radius:9px;background:{{c.primary}};color:#fff;font-size:12.5px;font-weight:700;cursor:pointer">+ Yeni Kişi</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+            <sc-for list="{{filteredContacts}}" as="p" hint-placeholder-count="6">
+              <div onClick="{{p.onOpen}}" style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:18px;cursor:pointer" style-hover="border-color:{{c.accent}}">
+                <div style="display:flex;gap:12px;align-items:center">
+                  <div style="width:44px;height:44px;border-radius:50%;background:{{p.color}};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0">{{p.initials}}</div>
+                  <div style="min-width:0">
+                    <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{p.name}}</div>
+                    <div style="font-size:12px;color:{{c.textSecondary}};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{p.position}} · {{p.company}}</div>
+                  </div>
+                </div>
+                <div style="margin-top:14px;font-size:12.5px;color:{{c.textSecondary}};display:flex;flex-direction:column;gap:5px">
+                  <div>📞 {{p.phone}}</div>
+                  <div>✉️ {{p.email}}</div>
+                  <div>Son görüşme: {{p.lastContact}}</div>
+                </div>
+                <div style="display:flex;gap:6px;margin-top:12px;flex-wrap:wrap">
+                  <sc-for list="{{p.tags}}" as="t" hint-placeholder-count="2">
+                    <span style="font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;background:{{c.accentBg}};color:{{c.accent}}">{{t}}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- ORGS -->
+      <sc-if value="{{isOrgs}}" hint-placeholder-val="{{false}}">
+        <div style="animation:fadeIn .3s ease">
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px;gap:10px">
+            <div style="font-size:13px;color:{{c.textSecondary}}">{{orgCount}} kurum listeleniyor</div>
+            <div onClick="{{newOrg}}" style="padding:9px 16px;border-radius:9px;background:{{c.primary}};color:#fff;font-size:12.5px;font-weight:700;cursor:pointer">+ Yeni Kurum</div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+            <sc-for list="{{organizations}}" as="o" hint-placeholder-count="6">
+              <div onClick="{{o.onOpen}}" style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:18px;cursor:pointer" style-hover="border-color:{{c.accent}}">
+                <div style="display:flex;gap:12px;align-items:center">
+                  <div style="width:44px;height:44px;border-radius:12px;background:{{c.primary}};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;flex-shrink:0">{{o.logoLetter}}</div>
+                  <div style="min-width:0">
+                    <div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{o.name}}</div>
+                    <div style="font-size:12px;color:{{c.textSecondary}}">{{o.sector}}</div>
+                  </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+                  <div style="background:{{c.bg}};border-radius:9px;padding:8px 10px">
+                    <div style="font-size:10.5px;color:{{c.textSecondary}}">Toplam Randevu</div>
+                    <div style="font-size:15px;font-weight:700">{{o.totalAppointments}}</div>
+                  </div>
+                  <div style="background:{{c.bg}};border-radius:9px;padding:8px 10px">
+                    <div style="font-size:10.5px;color:{{c.textSecondary}}">Son Görüşme</div>
+                    <div style="font-size:13px;font-weight:700">{{o.lastContact}}</div>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- CALENDAR -->
+      <sc-if value="{{isCalendar}}" hint-placeholder-val="{{false}}">
+        <div style="animation:fadeIn .3s ease">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div style="display:flex;gap:8px">
+              <div onClick="{{prevMonth}}" style="cursor:pointer;padding:8px 13px;border-radius:9px;border:1px solid {{c.border}};background:{{c.surfaceSolid}}">‹</div>
+              <div style="padding:8px 16px;border-radius:9px;background:{{c.surfaceSolid}};border:1px solid {{c.border}};font-weight:700;font-size:13.5px">{{monthLabel}}</div>
+              <div onClick="{{nextMonth}}" style="cursor:pointer;padding:8px 13px;border-radius:9px;border:1px solid {{c.border}};background:{{c.surfaceSolid}}">›</div>
+            </div>
+            <div style="display:flex;gap:6px;background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:10px;padding:4px">
+              <sc-for list="{{calendarViews}}" as="cv" hint-placeholder-count="4">
+                <div onClick="{{cv.onClick}}" style="{{cv.style}}">{{cv.label}}</div>
+              </sc-for>
+            </div>
+          </div>
+          <sc-if value="{{isCalMonth}}" hint-placeholder-val="{{true}}">
+            <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:repeat(7,1fr)">
+                <sc-for list="{{weekdayLabels}}" as="wd" hint-placeholder-count="7">
+                  <div style="padding:10px;text-align:center;font-size:11.5px;font-weight:700;color:{{c.textSecondary}};border-bottom:1px solid {{c.border}}">{{wd}}</div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(7,1fr)">
+                <sc-for list="{{calendarCells}}" as="cell" hint-placeholder-count="35">
+                  <div onClick="{{cell.onClick}}" style="min-height:104px;padding:8px;border-right:1px solid {{c.border}};border-bottom:1px solid {{c.border}};opacity:{{cell.opacity}};cursor:pointer">
+                    <div style="font-size:12px;font-weight:700;color:{{cell.dayColor}}">{{cell.day}}</div>
+                    <div style="display:flex;flex-direction:column;gap:3px;margin-top:5px">
+                      <sc-for list="{{cell.events}}" as="ev" hint-placeholder-count="2">
+                        <div style="font-size:10px;padding:2px 6px;border-radius:5px;background:{{ev.bg}};color:{{ev.color}};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600">{{ev.title}}</div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isCalWeek}}" hint-placeholder-val="{{false}}">
+            <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;overflow:hidden;display:grid;grid-template-columns:repeat(7,1fr)">
+              <sc-for list="{{weekCells}}" as="wc" hint-placeholder-count="7">
+                <div onClick="{{wc.onClick}}" style="min-height:220px;padding:10px;border-right:1px solid {{c.border}};cursor:pointer;background:{{wc.bg}}">
+                  <div style="font-size:11px;font-weight:700;color:{{c.textSecondary}}">{{wc.label}}</div>
+                  <div style="font-size:14px;font-weight:700;margin-top:2px">{{wc.day}}</div>
+                  <div style="display:flex;flex-direction:column;gap:4px;margin-top:8px">
+                    <sc-for list="{{wc.events}}" as="ev2" hint-placeholder-count="2">
+                      <div style="font-size:10.5px;padding:3px 7px;border-radius:5px;background:{{ev2.bg}};color:{{ev2.color}};font-weight:600">{{ev2.title}}</div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isCalDay}}" hint-placeholder-val="{{false}}">
+            <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+              <div style="font-size:14.5px;font-weight:700;margin-bottom:14px;text-transform:capitalize">{{selectedDayLabel}}</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{dayAppts}}" as="da" hint-placeholder-count="2">
+                  <div onClick="{{da.onOpen}}" style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid {{c.border}};border-radius:10px;cursor:pointer">
+                    <div style="width:52px;font-size:12.5px;font-weight:700;color:{{c.textSecondary}}">{{da.time}}</div>
+                    <div style="flex:1"><div style="font-weight:600;font-size:13px">{{da.title}}</div><div style="font-size:11.5px;color:{{c.textSecondary}}">{{da.org}} · {{da.location}}</div></div>
+                    <span style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;background:{{da.statusBg}};color:{{da.statusColor}}">{{da.status}}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isCalAgenda}}" hint-placeholder-val="{{false}}">
+            <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;overflow:hidden">
+              <sc-for list="{{agendaList}}" as="ag" hint-placeholder-count="8">
+                <div onClick="{{ag.onOpen}}" style="display:flex;align-items:center;gap:14px;padding:13px 20px;border-bottom:1px solid {{c.border}};cursor:pointer" style-hover="background:{{c.bg}}">
+                  <div style="width:90px;font-size:12px;color:{{c.textSecondary}}">{{ag.dateDisplay}}</div>
+                  <div style="width:50px;font-size:12px;color:{{c.textSecondary}}">{{ag.time}}</div>
+                  <div style="flex:1;font-weight:600;font-size:13px">{{ag.title}}</div>
+                  <div style="font-size:12px;color:{{c.textSecondary}}">{{ag.org}}</div>
+                  <span style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;background:{{ag.statusBg}};color:{{ag.statusColor}}">{{ag.status}}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <!-- REPORTS -->
+      <sc-if value="{{isReports}}" hint-placeholder-val="{{false}}">
+        <div style="animation:fadeIn .3s ease;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">En Aktif Kurumlar</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{topOrgs}}" as="to" hint-placeholder-count="5">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span>{{to.name}}</span><span style="font-weight:700">{{to.count}}</span></div>
+                  <div style="height:8px;border-radius:5px;background:{{c.bg}};overflow:hidden"><div style="height:100%;width:{{to.pct}};background:{{c.accent}};border-radius:5px"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">En Aktif Personel</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <sc-for list="{{topStaff}}" as="ts" hint-placeholder-count="5">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:5px"><span>{{ts.name}}</span><span style="font-weight:700">{{ts.count}}</span></div>
+                  <div style="height:8px;border-radius:5px;background:{{c.bg}};overflow:hidden"><div style="height:100%;width:{{ts.pct}};background:{{c.primary}};border-radius:5px"></div></div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Yıllık Performans</div>
+            <div style="display:flex;align-items:flex-end;gap:8px;height:140px">
+              <sc-for list="{{yearlyData}}" as="y" hint-placeholder-count="6">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end">
+                  <div style="width:100%;background:{{c.success}};border-radius:5px 5px 0 0;height:{{y.heightPct}}"></div>
+                  <div style="font-size:10px;color:{{c.textSecondary}}">{{y.label}}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Toplantı Süreleri (Ortalama, dk)</div>
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-for list="{{durationByType}}" as="d" hint-placeholder-count="3">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="width:80px;font-size:12.5px;color:{{c.textSecondary}}">{{d.label}}</div>
+                  <div style="flex:1;height:10px;border-radius:5px;background:{{c.bg}};overflow:hidden"><div style="height:100%;width:{{d.pct}};background:{{d.color}};border-radius:5px"></div></div>
+                  <div style="width:36px;text-align:right;font-weight:700;font-size:12.5px">{{d.value}}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <!-- SETTINGS -->
+      <sc-if value="{{isSettings}}" hint-placeholder-val="{{false}}">
+        <div style="animation:fadeIn .3s ease;max-width:640px;display:flex;flex-direction:column;gap:16px">
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Profil</div>
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:60px;height:60px;border-radius:50%;background:{{c.accent}};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px">NA</div>
+              <div>
+                <div style="font-weight:700;font-size:15px">Nisa Aydın</div>
+                <div style="font-size:12.5px;color:{{c.textSecondary}}">nisa.aydin@mersinteknopark.com.tr</div>
+              </div>
+            </div>
+          </div>
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Görünüm</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+              <span style="font-size:13px">Karanlık Mod</span>
+              <div onClick="{{toggleDark}}" style="{{darkSwitchStyle}}"><div style="{{darkKnobStyle}}"></div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid {{c.border}}">
+              <span style="font-size:13px">Dil</span>
+              <select style="padding:6px 10px;border-radius:8px;border:1px solid {{c.border}};background:{{c.bg}};color:{{c.textPrimary}}"><option>Türkçe</option><option>English</option></select>
+            </div>
+          </div>
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Bildirimler</div>
+            <sc-for list="{{notifSettings}}" as="ns" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid {{c.border}}">
+                <span style="font-size:13px">{{ns.label}}</span>
+                <div onClick="{{ns.onToggle}}" style="{{ns.switchStyle}}"><div style="{{ns.knobStyle}}"></div></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:{{c.surfaceSolid}};border:1px solid {{c.border}};border-radius:16px;padding:22px">
+            <div style="font-size:14.5px;font-weight:700;margin-bottom:16px">Güvenlik</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+              <span style="font-size:13px">İki Adımlı Doğrulama (2FA)</span>
+              <div onClick="{{toggle2fa}}" style="{{twoFaSwitchStyle}}"><div style="{{twoFaKnobStyle}}"></div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid {{c.border}}">
+              <span style="font-size:13px">Şifre Değiştir</span>
+              <div onClick="{{openPasswordModal}}" style="font-size:12.5px;font-weight:700;color:{{c.accent}};cursor:pointer">Değiştir</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <!-- APPOINTMENT DRAWER -->
+  <sc-if value="{{drawerOpen}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeDrawer}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:40"></div>
+    <div style="position:fixed;top:0;right:0;height:100%;width:440px;background:{{c.surfaceSolid}};z-index:41;box-shadow:-8px 0 32px rgba(0,0,0,0.18);display:flex;flex-direction:column;animation:slideIn .25s ease">
+      <div style="padding:22px 24px;border-bottom:1px solid {{c.border}};display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div style="font-size:17px;font-weight:700">{{selectedAppt.title}}</div>
+          <div style="font-size:12.5px;color:{{c.textSecondary}};margin-top:4px">{{selectedAppt.dateDisplay}} · {{selectedAppt.time}} · {{selectedAppt.location}}</div>
+          <span style="display:inline-block;margin-top:8px;padding:4px 10px;border-radius:7px;font-size:11.5px;font-weight:700;background:{{selectedAppt.statusBg}};color:{{selectedAppt.statusColor}}">{{selectedAppt.status}}</span>
+        </div>
+        <div onClick="{{closeDrawer}}" style="cursor:pointer;font-size:20px;color:{{c.textSecondary}};line-height:1">×</div>
+      </div>
+      <div style="display:flex;gap:4px;padding:12px 24px 0 24px;flex-wrap:wrap;border-bottom:1px solid {{c.border}}">
+        <sc-for list="{{drawerTabs}}" as="dt" hint-placeholder-count="8">
+          <div onClick="{{dt.onClick}}" style="{{dt.style}}">{{dt.label}}</div>
+        </sc-for>
+      </div>
+      <div style="flex:1;overflow:auto;padding:20px 24px">
+        <sc-if value="{{isDrawerTab.notlar}}" hint-placeholder-val="{{true}}">
+          <div style="font-size:13px;color:{{c.textSecondary}};line-height:1.6">Toplantı öncesi sunum materyalleri hazırlanacak. Katılımcılardan bütçe onayı bekleniyor. Görüşme sonrası aksiyon maddeleri paylaşılacak.</div>
+        </sc-if>
+        <sc-if value="{{isDrawerTab.dosyalar}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid {{c.border}};border-radius:10px;font-size:13px">📄 Sunum_Taslak_v2.pdf</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid {{c.border}};border-radius:10px;font-size:13px">📊 Butce_Analizi.xlsx</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{isDrawerTab.yorumlar}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font-size:13px"><strong>Emre Kaya:</strong> Katılımcı listesini güncelledim.</div>
+            <div style="font-size:13px"><strong>Aylin Demir:</strong> Salon rezervasyonu onaylandı.</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{isDrawerTab.katilimcilar}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{selectedAppt.participants}}" as="pt" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px"><div style="width:28px;height:28px;border-radius:50%;background:{{c.accent}};color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center">{{pt.initials}}</div>{{pt.name}}</div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{isDrawerTab.timeline}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex;flex-direction:column;gap:14px;border-left:2px solid {{c.border}};padding-left:14px">
+            <div><div style="font-size:12.5px;font-weight:700">Randevu oluşturuldu</div><div style="font-size:11.5px;color:{{c.textSecondary}}">3 gün önce</div></div>
+            <div><div style="font-size:12.5px;font-weight:700">Katılımcılar davet edildi</div><div style="font-size:11.5px;color:{{c.textSecondary}}">2 gün önce</div></div>
+            <div><div style="font-size:12.5px;font-weight:700">Hatırlatma e-postası gönderildi</div><div style="font-size:11.5px;color:{{c.textSecondary}}">1 gün önce</div></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{isDrawerTab.hatirlaticilar}}" hint-placeholder-val="{{false}}">
+          <div style="font-size:13px;color:{{c.textSecondary}}">Toplantıdan 1 gün ve 1 saat önce hatırlatma e-postası gönderilecek.</div>
+        </sc-if>
+        <sc-if value="{{isDrawerTab.mail}}" hint-placeholder-val="{{false}}">
+          <div style="font-size:13px;color:{{c.textSecondary}}">Davet e-postası 18.07.2026 tarihinde gönderildi ve okundu olarak işaretlendi.</div>
+        </sc-if>
+        <sc-if value="{{isDrawerTab.durum}}" hint-placeholder-val="{{false}}">
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:13px">
+            <div>Planlandı → Devam Ediyor <span style="color:{{c.textSecondary}}">(2 gün önce)</span></div>
+            <div>Devam Ediyor → {{selectedAppt.status}} <span style="color:{{c.textSecondary}}">(bugün)</span></div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- CONTACT DETAIL -->
+  <sc-if value="{{contactDrawerOpen}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeContact}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:40"></div>
+    <div style="position:fixed;top:0;right:0;height:100%;width:400px;background:{{c.surfaceSolid}};z-index:41;box-shadow:-8px 0 32px rgba(0,0,0,0.18);padding:24px;box-sizing:border-box;overflow:auto;animation:slideIn .25s ease">
+      <div onClick="{{closeContact}}" style="cursor:pointer;font-size:20px;color:{{c.textSecondary}};text-align:right">×</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:8px">
+        <div style="width:56px;height:56px;border-radius:50%;background:{{selectedContact.color}};color:#fff;font-weight:700;font-size:18px;display:flex;align-items:center;justify-content:center">{{selectedContact.initials}}</div>
+        <div><div style="font-weight:700;font-size:16px">{{selectedContact.name}}</div><div style="font-size:12.5px;color:{{c.textSecondary}}">{{selectedContact.position}} · {{selectedContact.company}}</div></div>
+      </div>
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:10px;font-size:13px">
+        <div>📞 {{selectedContact.phone}}</div>
+        <div>✉️ {{selectedContact.email}}</div>
+        <div>Son görüşme: {{selectedContact.lastContact}}</div>
+        <div>Son arama: {{selectedContact.lastCall}}</div>
+      </div>
+      <div style="margin-top:18px;font-size:13px;color:{{c.textSecondary}};line-height:1.6">{{selectedContact.notes}}</div>
+    </div>
+  </sc-if>
+
+  <!-- ORG DETAIL -->
+  <sc-if value="{{orgDrawerOpen}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeOrg}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:40"></div>
+    <div style="position:fixed;top:0;right:0;height:100%;width:420px;background:{{c.surfaceSolid}};z-index:41;box-shadow:-8px 0 32px rgba(0,0,0,0.18);padding:24px;box-sizing:border-box;overflow:auto;animation:slideIn .25s ease">
+      <div onClick="{{closeOrg}}" style="cursor:pointer;font-size:20px;color:{{c.textSecondary}};text-align:right">×</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-top:8px">
+        <div style="width:56px;height:56px;border-radius:14px;background:{{c.primary}};color:#fff;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center">{{selectedOrg.logoLetter}}</div>
+        <div><div style="font-weight:700;font-size:16px">{{selectedOrg.name}}</div><div style="font-size:12.5px;color:{{c.textSecondary}}">{{selectedOrg.sector}}</div></div>
+      </div>
+      <div style="margin-top:18px;background:{{c.bg}};border-radius:10px;height:110px;display:flex;align-items:center;justify-content:center;font-size:11px;color:{{c.textSecondary}};font-family:monospace;background-image:repeating-linear-gradient(45deg,{{c.border}} 0,{{c.border}} 2px,transparent 2px,transparent 10px)">harita önizlemesi</div>
+      <div style="margin-top:16px;display:flex;flex-direction:column;gap:9px;font-size:13px">
+        <div>👤 {{selectedOrg.contactPerson}}</div>
+        <div>📞 {{selectedOrg.phone}}</div>
+        <div>✉️ {{selectedOrg.email}}</div>
+        <div>📍 {{selectedOrg.address}}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px">
+        <div style="background:{{c.bg}};border-radius:9px;padding:10px"><div style="font-size:10.5px;color:{{c.textSecondary}}">Toplam Görüşme</div><div style="font-size:16px;font-weight:700">{{selectedOrg.totalMeetings}}</div></div>
+        <div style="background:{{c.bg}};border-radius:9px;padding:10px"><div style="font-size:10.5px;color:{{c.textSecondary}}">Toplam Randevu</div><div style="font-size:16px;font-weight:700">{{selectedOrg.totalAppointments}}</div></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- SEARCH PALETTE -->
+  <sc-if value="{{searchOpen}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeSearch}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:50;display:flex;align-items:flex-start;justify-content:center;padding-top:110px">
+      <div onClick="{{stopProp}}" style="width:560px;max-width:90vw;background:{{c.surfaceSolid}};border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden">
+        <input autoFocus="{{true}}" value="{{globalQuery}}" onChange="{{onGlobalQuery}}" placeholder="Kişi, kurum veya randevu ara..." style="width:100%;box-sizing:border-box;padding:18px 20px;border:none;outline:none;font-size:15px;border-bottom:1px solid {{c.border}};background:transparent;color:{{c.textPrimary}}" />
+        <div style="max-height:320px;overflow:auto;padding:8px">
+          <sc-for list="{{globalResults}}" as="gr" hint-placeholder-count="4">
+            <div onClick="{{gr.onClick}}" style="padding:11px 14px;border-radius:9px;cursor:pointer;display:flex;justify-content:space-between;font-size:13.5px" style-hover="background:{{c.bg}}">
+              <span>{{gr.label}}</span><span style="color:{{c.textSecondary}};font-size:11.5px">{{gr.type}}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- FORM MODALS -->
+  <sc-if value="{{isModalAppt}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeModal}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px">
+      <form onClick="{{stopProp}}" onSubmit="{{submitAppointment}}" style="width:440px;max-width:92vw;max-height:88vh;overflow:auto;background:{{c.surfaceSolid}};border-radius:16px;padding:24px;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+        <div style="font-size:16px;font-weight:700;margin-bottom:16px">Yeni Randevu</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <input required="{{true}}" value="{{apptForm.title}}" onChange="{{apptOnTitle}}" placeholder="Başlık" style="{{inputStyle}}" />
+          <select value="{{apptForm.org}}" onChange="{{apptOnOrg}}" style="{{inputStyle}}">
+            <option value="">Kurum seçin</option>
+            <sc-for list="{{orgNames}}" as="on2" hint-placeholder-count="6"><option value="{{on2}}">{{on2}}</option></sc-for>
+          </select>
+          <div style="display:flex;gap:10px">
+            <input required="{{true}}" type="date" value="{{apptForm.date}}" onChange="{{apptOnDate}}" style="{{inputStyleHalf}}" />
+            <input type="time" value="{{apptForm.time}}" onChange="{{apptOnTime}}" style="{{inputStyleHalf}}" />
+          </div>
+          <input value="{{apptForm.location}}" onChange="{{apptOnLocation}}" placeholder="Konum" style="{{inputStyle}}" />
+          <select value="{{apptForm.priority}}" onChange="{{apptOnPriority}}" style="{{inputStyle}}">
+            <option value="Düşük">Düşük Öncelik</option>
+            <option value="Orta">Orta Öncelik</option>
+            <option value="Yüksek">Yüksek Öncelik</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+          <div onClick="{{closeModal}}" style="padding:10px 16px;border-radius:9px;border:1px solid {{c.border}};cursor:pointer;font-size:13px;font-weight:600">Vazgeç</div>
+          <button type="submit" style="padding:10px 18px;border-radius:9px;background:{{c.primary}};color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Oluştur</button>
+        </div>
+      </form>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isModalContact}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeModal}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px">
+      <form onClick="{{stopProp}}" onSubmit="{{submitContact}}" style="width:420px;max-width:92vw;background:{{c.surfaceSolid}};border-radius:16px;padding:24px;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+        <div style="font-size:16px;font-weight:700;margin-bottom:16px">Yeni Kişi</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <input required="{{true}}" value="{{contactForm.name}}" onChange="{{contactOnName}}" placeholder="Ad Soyad" style="{{inputStyle}}" />
+          <input value="{{contactForm.position}}" onChange="{{contactOnPosition}}" placeholder="Pozisyon" style="{{inputStyle}}" />
+          <input value="{{contactForm.company}}" onChange="{{contactOnCompany}}" placeholder="Şirket" style="{{inputStyle}}" />
+          <input value="{{contactForm.phone}}" onChange="{{contactOnPhone}}" placeholder="Telefon" style="{{inputStyle}}" />
+          <input type="email" value="{{contactForm.email}}" onChange="{{contactOnEmail}}" placeholder="E-posta" style="{{inputStyle}}" />
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+          <div onClick="{{closeModal}}" style="padding:10px 16px;border-radius:9px;border:1px solid {{c.border}};cursor:pointer;font-size:13px;font-weight:600">Vazgeç</div>
+          <button type="submit" style="padding:10px 18px;border-radius:9px;background:{{c.primary}};color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Ekle</button>
+        </div>
+      </form>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isModalOrg}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeModal}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px">
+      <form onClick="{{stopProp}}" onSubmit="{{submitOrg}}" style="width:440px;max-width:92vw;max-height:88vh;overflow:auto;background:{{c.surfaceSolid}};border-radius:16px;padding:24px;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+        <div style="font-size:16px;font-weight:700;margin-bottom:16px">Yeni Kurum</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <input required="{{true}}" value="{{orgForm.name}}" onChange="{{orgOnName}}" placeholder="Kurum Adı" style="{{inputStyle}}" />
+          <input value="{{orgForm.sector}}" onChange="{{orgOnSector}}" placeholder="Sektör" style="{{inputStyle}}" />
+          <input value="{{orgForm.contactPerson}}" onChange="{{orgOnContact}}" placeholder="Yetkili Kişi" style="{{inputStyle}}" />
+          <input value="{{orgForm.phone}}" onChange="{{orgOnPhone}}" placeholder="Telefon" style="{{inputStyle}}" />
+          <input type="email" value="{{orgForm.email}}" onChange="{{orgOnEmail}}" placeholder="E-posta" style="{{inputStyle}}" />
+          <input value="{{orgForm.address}}" onChange="{{orgOnAddress}}" placeholder="Adres" style="{{inputStyle}}" />
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+          <div onClick="{{closeModal}}" style="padding:10px 16px;border-radius:9px;border:1px solid {{c.border}};cursor:pointer;font-size:13px;font-weight:600">Vazgeç</div>
+          <button type="submit" style="padding:10px 18px;border-radius:9px;background:{{c.primary}};color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Ekle</button>
+        </div>
+      </form>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isModalTask}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeModal}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px">
+      <form onClick="{{stopProp}}" onSubmit="{{submitTask}}" style="width:400px;max-width:92vw;background:{{c.surfaceSolid}};border-radius:16px;padding:24px;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+        <div style="font-size:16px;font-weight:700;margin-bottom:16px">Yeni Görev</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <input required="{{true}}" value="{{taskForm.title}}" onChange="{{taskOnTitle}}" placeholder="Görev başlığı" style="{{inputStyle}}" />
+          <input type="date" value="{{taskForm.deadline}}" onChange="{{taskOnDeadline}}" style="{{inputStyle}}" />
+          <select value="{{taskForm.priority}}" onChange="{{taskOnPriority}}" style="{{inputStyle}}">
+            <option value="Düşük">Düşük Öncelik</option>
+            <option value="Orta">Orta Öncelik</option>
+            <option value="Yüksek">Yüksek Öncelik</option>
+          </select>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+          <div onClick="{{closeModal}}" style="padding:10px 16px;border-radius:9px;border:1px solid {{c.border}};cursor:pointer;font-size:13px;font-weight:600">Vazgeç</div>
+          <button type="submit" style="padding:10px 18px;border-radius:9px;background:{{c.primary}};color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Oluştur</button>
+        </div>
+      </form>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isModalPassword}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeModal}}" style="position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px">
+      <form onClick="{{stopProp}}" onSubmit="{{submitPassword}}" style="width:380px;max-width:92vw;background:{{c.surfaceSolid}};border-radius:16px;padding:24px;box-sizing:border-box;box-shadow:0 20px 60px rgba(0,0,0,0.3)">
+        <div style="font-size:16px;font-weight:700;margin-bottom:16px">Şifre Değiştir</div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <input required="{{true}}" type="password" value="{{passwordForm.current}}" onChange="{{pwOnCurrent}}" placeholder="Mevcut şifre" style="{{inputStyle}}" />
+          <input required="{{true}}" type="password" value="{{passwordForm.next}}" onChange="{{pwOnNext}}" placeholder="Yeni şifre" style="{{inputStyle}}" />
+          <input required="{{true}}" type="password" value="{{passwordForm.confirm}}" onChange="{{pwOnConfirm}}" placeholder="Yeni şifre (tekrar)" style="{{inputStyle}}" />
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px">
+          <div onClick="{{closeModal}}" style="padding:10px 16px;border-radius:9px;border:1px solid {{c.border}};cursor:pointer;font-size:13px;font-weight:600">Vazgeç</div>
+          <button type="submit" style="padding:10px 18px;border-radius:9px;background:{{c.primary}};color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Güncelle</button>
+        </div>
+      </form>
+    </div>
+  </sc-if>
+
+  <!-- TOAST -->
+  <sc-if value="{{toast}}" hint-placeholder-val="{{false}}">
+    <div style="position:fixed;bottom:24px;right:24px;background:{{c.textPrimary}};color:{{c.surfaceSolid}};padding:13px 20px;border-radius:11px;font-size:13.5px;font-weight:600;z-index:60;box-shadow:0 12px 30px rgba(0,0,0,0.25);animation:fadeIn .2s ease">{{toast}}</div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const LIGHT = {
+  bg:'#F8FAFC', sidebarBg:'#1E3A8A',
+  surface:'rgba(255,255,255,0.7)', surfaceSolid:'#FFFFFF', border:'rgba(15,23,42,0.09)',
+  textPrimary:'#0F172A', textSecondary:'#64748B',
+  accent:'#2563EB', primary:'#1E3A8A', success:'#22C55E', warning:'#F59E0B', danger:'#EF4444',
+  successBg:'rgba(34,197,94,0.13)', warningBg:'rgba(245,158,11,0.13)', dangerBg:'rgba(239,68,68,0.12)', accentBg:'rgba(37,99,235,0.1)'
+};
+const DARK = {
+  bg:'#0B1220', sidebarBg:'#0F1B3D',
+  surface:'rgba(30,41,59,0.5)', surfaceSolid:'#141D33', border:'rgba(255,255,255,0.08)',
+  textPrimary:'#E2E8F0', textSecondary:'#94A3B8',
+  accent:'#3B82F6', primary:'#3B5BDB', success:'#22C55E', warning:'#F59E0B', danger:'#EF4444',
+  successBg:'rgba(34,197,94,0.16)', warningBg:'rgba(245,158,11,0.16)', dangerBg:'rgba(239,68,68,0.18)', accentBg:'rgba(59,130,246,0.16)'
+};
+const PALETTE = ['#2563EB','#0EA5E9','#8B5CF6','#F59E0B','#22C55E','#EF4444'];
+const STATUS_META = {
+  'Tamamlandı':{bg:LIGHT.successBg,color:'#15803D'},
+  'İptal Edildi':{bg:LIGHT.dangerBg,color:'#B91C1C'},
+  'Planlandı':{bg:LIGHT.accentBg,color:'#1D4ED8'},
+  'Devam Ediyor':{bg:LIGHT.warningBg,color:'#B45309'}
+};
+const PRIO_META = {'Yüksek':{bg:LIGHT.dangerBg,color:'#B91C1C'},'Orta':{bg:LIGHT.warningBg,color:'#B45309'},'Düşük':{bg:LIGHT.accentBg,color:'#1D4ED8'}};
+
+class Component extends DCLogic {
+  state = {
+    activeTab:'dashboard', darkMode:false,
+    apptSearch:'', apptStatusFilter:'all', apptOrgFilter:'all', apptPage:1, selectedIds:{}, selectedApptId:null, drawerTab:'notlar',
+    contactSearch:'', selectedContactId:null, selectedOrgId:null,
+    calendarMonthOffset:0, calendarView:'Ay', selectedDayIso:'2026-07-23',
+    searchOpen:false, globalQuery:'', toast:null,
+    notif:{mail:true, sms:false, push:true}, twoFa:false,
+    activeModal:null,
+    apptForm:{title:'',org:'',date:'',time:'',location:'',priority:'Orta'},
+    contactForm:{name:'',position:'',company:'',phone:'',email:''},
+    orgForm:{name:'',sector:'',contactPerson:'',phone:'',email:'',address:''},
+    taskForm:{title:'',deadline:'',priority:'Orta'},
+    passwordForm:{current:'',next:'',confirm:''}
+  };
+
+  constructor(props){
+    super(props);
+    this.organizations = [
+      {id:1,name:'Mersin Teknopark',sector:'Teknoloji Geliştirme',logoLetter:'MT',contactPerson:'Kaan Yıldırım',phone:'0324 361 00 10',email:'info@mersinteknopark.com.tr',address:'Çiftlikköy Kampüsü, Mersin',totalMeetings:34,totalAppointments:18,lastContact:'21.07.2026'},
+      {id:2,name:'Akbank Genel Müdürlük',sector:'Bankacılık',logoLetter:'AK',contactPerson:'Elif Arslan',phone:'0212 385 55 55',email:'kurumsal@akbank.com',address:'Levent, İstanbul',totalMeetings:21,totalAppointments:11,lastContact:'18.07.2026'},
+      {id:3,name:'Turkcell Global Bilgi',sector:'Telekomünikasyon',logoLetter:'TC',contactPerson:'Mert Şahin',phone:'0212 313 10 00',email:'kurumsal@turkcell.com.tr',address:'Maslak, İstanbul',totalMeetings:16,totalAppointments:9,lastContact:'16.07.2026'},
+      {id:4,name:'Boğaziçi Üniversitesi TTO',sector:'Ar-Ge / Üniversite',logoLetter:'BÜ',contactPerson:'Burak Çelik',phone:'0212 359 70 00',email:'tto@boun.edu.tr',address:'Bebek, İstanbul',totalMeetings:12,totalAppointments:7,lastContact:'10.07.2026'},
+      {id:5,name:'Vestel Elektronik',sector:'Üretim',logoLetter:'VE',contactPerson:'Aylin Demir',phone:'0236 233 33 33',email:'kurumsal@vestel.com.tr',address:'Manisa',totalMeetings:9,totalAppointments:5,lastContact:'05.07.2026'},
+      {id:6,name:'Coca-Cola İçecek',sector:'Üretim / Gıda',logoLetter:'CC',contactPerson:'Nisa Yıldız',phone:'0216 528 40 00',email:'kurumsal@cci.com.tr',address:'Ataşehir, İstanbul',totalMeetings:7,totalAppointments:4,lastContact:'02.07.2026'}
+    ];
+    this.contacts = [
+      {id:1,name:'Nisa Yıldız',position:'Genel Müdür',company:'Coca-Cola İçecek',phone:'0532 111 22 33',email:'nisa.yildiz@cci.com.tr',lastContact:'13.07.2026',lastCall:'12.07.2026',tags:['VIP','Karar Verici'],notes:'Yatırım görüşmesi için önceliklendirilmeli.'},
+      {id:2,name:'Emre Kaya',position:'Proje Koordinatörü',company:'Mersin Teknopark',phone:'0533 222 33 44',email:'emre.kaya@mersinteknopark.com.tr',lastContact:'21.07.2026',lastCall:'20.07.2026',tags:['Operasyon'],notes:'Haftalık durum toplantılarını takip ediyor.'},
+      {id:3,name:'Aylin Demir',position:'Satın Alma Müdürü',company:'Vestel Elektronik',phone:'0534 333 44 55',email:'aylin.demir@vestel.com.tr',lastContact:'05.07.2026',lastCall:'03.07.2026',tags:['Tedarikçi'],notes:'Sözleşme yenileme sürecinde.'},
+      {id:4,name:'Mert Şahin',position:'Kurumsal İlişkiler',company:'Turkcell Global Bilgi',phone:'0535 444 55 66',email:'mert.sahin@turkcell.com.tr',lastContact:'16.07.2026',lastCall:'14.07.2026',tags:['Ortaklık'],notes:'Yeni entegrasyon teklifini bekliyor.'},
+      {id:5,name:'Elif Arslan',position:'Bölge Müdürü',company:'Akbank Genel Müdürlük',phone:'0536 555 66 77',email:'elif.arslan@akbank.com',lastContact:'18.07.2026',lastCall:'17.07.2026',tags:['VIP','Finans'],notes:'Bütçe onayı için görüşme planlandı.'},
+      {id:6,name:'Burak Çelik',position:'Ar-Ge Direktörü',company:'Boğaziçi Üniversitesi TTO',phone:'0537 666 77 88',email:'burak.celik@boun.edu.tr',lastContact:'10.07.2026',lastCall:'08.07.2026',tags:['Ar-Ge'],notes:'Ortak proje başvurusu hazırlanıyor.'}
+    ];
+    const rawAppts = [
+      {id:1,title:'Nisa ile Toplantı',dateISO:'2026-07-13',dateDisplay:'13.07.2026',time:'18:50',location:'Mersin Teknopark',org:'Mersin Teknopark',status:'Tamamlandı',priority:'Orta',participants:[{initials:'NY',name:'Nisa Yıldız'},{initials:'EK',name:'Emre Kaya'}]},
+      {id:2,title:'Önemli Toplantı',dateISO:'2026-07-16',dateDisplay:'16.07.2026',time:'18:50',location:'Mersin Teknopark',org:'Mersin Teknopark',status:'İptal Edildi',priority:'Yüksek',participants:[{initials:'MŞ',name:'Mert Şahin'}]},
+      {id:3,title:'Yönetim Kurulu Bütçe Toplantısı',dateISO:'2026-07-18',dateDisplay:'18.07.2026',time:'08:00',location:'Genel Merkez',org:'Akbank Genel Müdürlük',status:'Tamamlandı',priority:'Yüksek',participants:[{initials:'EA',name:'Elif Arslan'},{initials:'NA',name:'Nisa Aydın'}]},
+      {id:4,title:'Danışmanlık Görüşmesi',dateISO:'2026-07-20',dateDisplay:'20.07.2026',time:'11:00',location:'Online',org:'Boğaziçi Üniversitesi TTO',status:'İptal Edildi',priority:'Düşük',participants:[{initials:'BÇ',name:'Burak Çelik'}]},
+      {id:5,title:'Acil YK Toplantısı',dateISO:'2026-07-21',dateDisplay:'21.07.2026',time:'10:30',location:'Mersin Teknopark',org:'Mersin Teknopark',status:'Devam Ediyor',priority:'Yüksek',participants:[{initials:'NA',name:'Nisa Aydın'},{initials:'EK',name:'Emre Kaya'}]},
+      {id:6,title:'Proje Toplantısı',dateISO:'2026-07-22',dateDisplay:'22.07.2026',time:'14:30',location:'Ofis - Toplantı Odası',org:'Vestel Elektronik',status:'Planlandı',priority:'Orta',participants:[{initials:'AD',name:'Aylin Demir'}]},
+      {id:7,title:'Yeni Peyzaj için Toplantı',dateISO:'2026-07-25',dateDisplay:'25.07.2026',time:'10:30',location:'Mersin Teknopark',org:'Mersin Teknopark',status:'Planlandı',priority:'Düşük',participants:[{initials:'NA',name:'Nisa Aydın'}]},
+      {id:8,title:'Ortaklık Görüşmesi',dateISO:'2026-07-24',dateDisplay:'24.07.2026',time:'15:00',location:'Maslak Ofis',org:'Turkcell Global Bilgi',status:'Planlandı',priority:'Yüksek',participants:[{initials:'MŞ',name:'Mert Şahin'}]},
+      {id:9,title:'Tedarik Sözleşmesi Görüşmesi',dateISO:'2026-07-28',dateDisplay:'28.07.2026',time:'13:00',location:'Manisa',org:'Vestel Elektronik',status:'Planlandı',priority:'Orta',participants:[{initials:'AD',name:'Aylin Demir'}]},
+      {id:10,title:'Yatırımcı Sunumu',dateISO:'2026-07-30',dateDisplay:'30.07.2026',time:'09:30',location:'Ataşehir',org:'Coca-Cola İçecek',status:'Planlandı',priority:'Yüksek',participants:[{initials:'NY',name:'Nisa Yıldız'}]},
+      {id:11,title:'Ar-Ge Proje Değerlendirme',dateISO:'2026-08-03',dateDisplay:'03.08.2026',time:'11:30',location:'Bebek',org:'Boğaziçi Üniversitesi TTO',status:'Planlandı',priority:'Orta',participants:[{initials:'BÇ',name:'Burak Çelik'}]},
+      {id:12,title:'New Appointment Final Day',dateISO:'2026-08-31',dateDisplay:'31.08.2026',time:'17:00',location:'Mersin Teknopark',org:'Mersin Teknopark',status:'İptal Edildi',priority:'Düşük',participants:[{initials:'NA',name:'Nisa Aydın'}]}
+    ];
+    this.appointmentsFull = rawAppts.map(a=>({...a, _statusMeta:STATUS_META[a.status], _prioMeta:PRIO_META[a.priority]}));
+    this.activities = [
+      {who:'Emre Kaya',action:'yeni randevu oluşturdu: "Proje Toplantısı"',when:'2 saat önce',initials:'EK',color:'#2563EB'},
+      {who:'Aylin Demir',action:'"Tedarik Sözleşmesi Görüşmesi" randevusunu güncelledi',when:'5 saat önce',initials:'AD',color:'#8B5CF6'},
+      {who:'Nisa Aydın',action:'"Önemli Toplantı" randevusunu iptal etti',when:'dün',initials:'NA',color:'#F59E0B'},
+      {who:'Mert Şahin',action:'yeni kişi ekledi: Elif Arslan',when:'2 gün önce',initials:'MŞ',color:'#22C55E'},
+      {who:'Burak Çelik',action:'"Ar-Ge Proje Değerlendirme" için not ekledi',when:'3 gün önce',initials:'BÇ',color:'#EF4444'}
+    ];
+    this.tasks = [
+      {id:1,title:'Sunum hazırla',status:'todo'},
+      {id:2,title:'Bütçe onayını takip et',status:'todo'},
+      {id:3,title:'Katılımcı listesini güncelle',status:'todo'},
+      {id:4,title:'Salon rezervasyonu yap',status:'todo'},
+      {id:5,title:'Hatırlatma maili gönder',status:'todo'}
+    ];
+    this.monthlyRaw = [{label:'Oca',count:14},{label:'Şub',count:18},{label:'Mar',count:22},{label:'Nis',count:19},{label:'May',count:26},{label:'Haz',count:31},{label:'Tem',count:24},{label:'Ağu',count:9},{label:'Eyl',count:0},{label:'Eki',count:0},{label:'Kas',count:0},{label:'Ara',count:0}];
+    this.yearlyRaw = [{label:'2021',count:120},{label:'2022',count:145},{label:'2023',count:168},{label:'2024',count:190},{label:'2025',count:210},{label:'2026',count:134}];
+    this.orgDistributionRaw = [{name:'Mersin Teknopark',count:34},{name:'Akbank Genel Müdürlük',count:21},{name:'Turkcell Global Bilgi',count:16},{name:'Boğaziçi Üniversitesi TTO',count:12},{name:'Vestel Elektronik',count:9}];
+    this.topStaffRaw = [{name:'Nisa Aydın',count:28},{name:'Emre Kaya',count:22},{name:'Aylin Demir',count:17},{name:'Mert Şahin',count:13},{name:'Burak Çelik',count:9}];
+    this.durationByType = [
+      {label:'Online',value:32,pct:'64%',color:'#2563EB'},
+      {label:'Fiziksel',value:50,pct:'100%',color:'#1E3A8A'},
+      {label:'Telefon',value:14,pct:'28%',color:'#22C55E'}
+    ];
+    this.heatmapRaw = [];
+    const days=['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+    for(let d=0; d<7; d++){ for(let h=0; h<8; h++){ this.heatmapRaw.push({d,h,v: Math.round(((d*13+h*7)%10))}); } }
+    this.weekdayLabels = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'];
+  }
+
+  toggleDark = () => this.setState(s=>({darkMode:!s.darkMode}));
+  setTab = (tab) => () => this.setState({activeTab:tab, searchOpen:false});
+  showToast = (msg) => { this.setState({toast:msg}); setTimeout(()=>this.setState({toast:null}), 2200); };
+
+  openSearch = () => this.setState({searchOpen:true, globalQuery:''});
+  closeSearch = () => this.setState({searchOpen:false});
+  stopProp = (e) => e.stopPropagation();
+  onGlobalQuery = (e) => this.setState({globalQuery:e.target.value});
+
+  onApptSearch = (e) => this.setState({apptSearch:e.target.value, apptPage:1});
+  onApptStatus = (e) => this.setState({apptStatusFilter:e.target.value, apptPage:1});
+  onApptOrg = (e) => this.setState({apptOrgFilter:e.target.value, apptPage:1});
+  prevPage = () => this.setState(s=>({apptPage:Math.max(1,s.apptPage-1)}));
+  nextPage = () => this.setState(s=>({apptPage:s.apptPage+1}));
+  toggleSelect = (id) => (e) => { e.stopPropagation(); this.setState(s=>{ const sel={...s.selectedIds}; if(sel[id]) delete sel[id]; else sel[id]=true; return {selectedIds:sel}; }); };
+  clearSelection = () => this.setState({selectedIds:{}});
+  bulkComplete = () => {
+    const ids = Object.keys(this.state.selectedIds).map(Number);
+    this.appointmentsFull = this.appointmentsFull.map(a => ids.includes(a.id) ? {...a, status:'Tamamlandı', _statusMeta:STATUS_META['Tamamlandı']} : a);
+    this.setState({selectedIds:{}});
+    this.showToast('Seçili randevular tamamlandı olarak işaretlendi');
+  };
+  bulkCancel = () => {
+    const ids = Object.keys(this.state.selectedIds).map(Number);
+    this.appointmentsFull = this.appointmentsFull.map(a => ids.includes(a.id) ? {...a, status:'İptal Edildi', _statusMeta:STATUS_META['İptal Edildi']} : a);
+    this.setState({selectedIds:{}});
+    this.showToast('Seçili randevular iptal edildi');
+  };
+  exportAs = (fmt) => () => this.showToast(fmt + ' olarak dışa aktarıldı');
+  newAppointment = () => this.setState({activeModal:'appointment'});
+  newContact = () => this.setState({activeModal:'contact'});
+  newOrg = () => this.setState({activeModal:'org'});
+  newTask = () => this.setState({activeModal:'task'});
+  openPasswordModal = () => this.setState({activeModal:'password'});
+  closeModal = () => this.setState({activeModal:null});
+  updateForm = (formKey, field) => (e) => this.setState(s=>({[formKey]:{...s[formKey],[field]:e.target.value}}));
+
+  submitAppointment = (e) => {
+    e.preventDefault();
+    const f = this.state.apptForm;
+    if(!f.title || !f.date){ this.showToast('Başlık ve tarih zorunlu'); return; }
+    const id = Math.max(0,...this.appointmentsFull.map(a=>a.id))+1;
+    const dateDisplay = new Date(f.date+'T00:00:00').toLocaleDateString('tr-TR');
+    this.appointmentsFull = [...this.appointmentsFull, {
+      id, title:f.title, dateISO:f.date, dateDisplay, time:f.time||'09:00', location:f.location||'Ofis',
+      org:f.org||(this.organizations[0]&&this.organizations[0].name)||'', status:'Planlandı', priority:f.priority,
+      _statusMeta:STATUS_META['Planlandı'], _prioMeta:PRIO_META[f.priority],
+      participants:[{initials:'NA',name:'Nisa Aydın'}]
+    }];
+    this.setState({activeModal:null, apptForm:{title:'',org:'',date:'',time:'',location:'',priority:'Orta'}});
+    this.showToast('Randevu oluşturuldu');
+  };
+  submitContact = (e) => {
+    e.preventDefault();
+    const f = this.state.contactForm;
+    if(!f.name){ this.showToast('Ad Soyad zorunlu'); return; }
+    const id = Math.max(0,...this.contacts.map(p=>p.id))+1;
+    this.contacts = [...this.contacts, {id, name:f.name, position:f.position, company:f.company, phone:f.phone, email:f.email, lastContact:'-', lastCall:'-', tags:[], notes:''}];
+    this.setState({activeModal:null, contactForm:{name:'',position:'',company:'',phone:'',email:''}});
+    this.showToast('Kişi eklendi');
+  };
+  submitOrg = (e) => {
+    e.preventDefault();
+    const f = this.state.orgForm;
+    if(!f.name){ this.showToast('Kurum adı zorunlu'); return; }
+    const id = Math.max(0,...this.organizations.map(o=>o.id))+1;
+    const logoLetter = f.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    this.organizations = [...this.organizations, {id, name:f.name, sector:f.sector||'-', logoLetter, contactPerson:f.contactPerson, phone:f.phone, email:f.email, address:f.address, totalMeetings:0, totalAppointments:0, lastContact:'-'}];
+    this.setState({activeModal:null, orgForm:{name:'',sector:'',contactPerson:'',phone:'',email:'',address:''}});
+    this.showToast('Kurum eklendi');
+  };
+  submitTask = (e) => {
+    e.preventDefault();
+    const f = this.state.taskForm;
+    if(!f.title){ this.showToast('Görev başlığı zorunlu'); return; }
+    const id = Math.max(0,...this.tasks.map(t=>t.id))+1;
+    this.tasks = [...this.tasks, {id, title:f.title, deadline:f.deadline, priority:f.priority, status:'todo'}];
+    this.setState({activeModal:null, taskForm:{title:'',deadline:'',priority:'Orta'}});
+    this.showToast('Görev oluşturuldu');
+  };
+  submitPassword = (e) => {
+    e.preventDefault();
+    const f = this.state.passwordForm;
+    if(!f.current || !f.next || f.next.length<6){ this.showToast('Şifre en az 6 karakter olmalı'); return; }
+    if(f.next!==f.confirm){ this.showToast('Yeni şifreler eşleşmiyor'); return; }
+    this.setState({activeModal:null, passwordForm:{current:'',next:'',confirm:''}});
+    this.showToast('Şifre güncellendi');
+  };
+  selectDay = (iso) => () => this.setState({selectedDayIso:iso, calendarView:'Gün'});
+
+  openDrawer = (id) => () => this.setState({selectedApptId:id, drawerTab:'notlar'});
+  closeDrawer = () => this.setState({selectedApptId:null});
+  setDrawerTab = (tab) => () => this.setState({drawerTab:tab});
+
+  onContactSearch = (e) => this.setState({contactSearch:e.target.value});
+  openContact = (id) => () => this.setState({selectedContactId:id});
+  closeContact = () => this.setState({selectedContactId:null});
+
+  openOrg = (id) => () => this.setState({selectedOrgId:id});
+  closeOrg = () => this.setState({selectedOrgId:null});
+
+  prevMonth = () => this.setState(s=>({calendarMonthOffset:s.calendarMonthOffset-1}));
+  nextMonth = () => this.setState(s=>({calendarMonthOffset:s.calendarMonthOffset+1}));
+  setCalendarView = (v) => () => this.setState({calendarView:v});
+
+  toggleNotif = (key) => () => this.setState(s=>({notif:{...s.notif,[key]:!s.notif[key]}}));
+  toggle2fa = () => this.setState(s=>({twoFa:!s.twoFa}));
+
+  buildCalendar(monthOffset){
+    const base = new Date(2026,6,1);
+    base.setMonth(base.getMonth()+monthOffset);
+    const year=base.getFullYear(), month=base.getMonth();
+    const firstDay=new Date(year,month,1);
+    const startWeekday=(firstDay.getDay()+6)%7;
+    const daysInMonth=new Date(year,month+1,0).getDate();
+    const prevDaysInMonth=new Date(year,month,0).getDate();
+    const cells=[];
+    for(let i=0;i<startWeekday;i++){ cells.push({day:prevDaysInMonth-startWeekday+i+1, otherMonth:true, iso:null}); }
+    for(let d=1; d<=daysInMonth; d++){
+      const iso = year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+      cells.push({day:d, otherMonth:false, iso});
+    }
+    while(cells.length%7!==0 || cells.length<35){ cells.push({day:cells.length - (startWeekday+daysInMonth) + 1, otherMonth:true, iso:null}); }
+    const evColors = {'Tamamlandı':{bg:'#DCFCE7',color:'#15803D'},'İptal Edildi':{bg:'#FEE2E2',color:'#B91C1C'},'Planlandı':{bg:'#DBEAFE',color:'#1D4ED8'},'Devam Ediyor':{bg:'#FEF3C7',color:'#B45309'}};
+    return {cells, monthLabel: base.toLocaleDateString('tr-TR',{month:'long',year:'numeric'}), evColors};
+  }
+
+  buildWeek(iso, evColors, eventsByDate, c){
+    const d = new Date(iso+'T00:00:00');
+    const weekday=(d.getDay()+6)%7;
+    const monday = new Date(d); monday.setDate(d.getDate()-weekday);
+    const cells=[];
+    for(let i=0;i<7;i++){
+      const cur = new Date(monday); cur.setDate(monday.getDate()+i);
+      const iso2 = cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0')+'-'+String(cur.getDate()).padStart(2,'0');
+      const evs = (eventsByDate[iso2]||[]).map(ev=>({title:ev.title, bg:evColors[ev.status].bg, color:evColors[ev.status].color}));
+      cells.push({day:cur.getDate(), label:this.weekdayLabels[i], events:evs, onClick:this.selectDay(iso2), bg: iso2===this.state.selectedDayIso ? c.accentBg : 'transparent'});
+    }
+    return cells;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const c = s.darkMode ? DARK : LIGHT;
+    const navDefs = [
+      ['dashboard','Dashboard'],['appointments','Randevular'],['contacts','Kişiler'],
+      ['orgs','Kurumlar'],['calendar','Takvim'],['reports','Raporlar'],['settings','Ayarlar']
+    ];
+    const navItems = navDefs.map(([key,label])=>{
+      const active = s.activeTab===key;
+      return {
+        label, onClick:this.setTab(key),
+        rowStyle:`display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;background:${active?'rgba(255,255,255,0.14)':'transparent'};transition:background .15s`,
+        dotStyle:`width:6px;height:6px;border-radius:50%;background:${active?'#fff':'rgba(255,255,255,0.35)'}`,
+        labelStyle:`font-size:13.5px;font-weight:${active?'700':'500'};color:${active?'#fff':'rgba(255,255,255,0.65)'}`
+      };
+    });
+    const pageTitles = {dashboard:'Dashboard',appointments:'Randevular',contacts:'Kişiler',orgs:'Kurumlar',calendar:'Takvim',reports:'Raporlar',settings:'Ayarlar'};
+
+    // ---- appointments (precomputed status/priority colors) ----
+    const appts = this.appointmentsFull.map(a=>({
+      ...a,
+      statusBg:a._statusMeta.bg, statusColor:a._statusMeta.color,
+      priorityBg:a._prioMeta.bg, priorityColor:a._prioMeta.color,
+      selected: !!s.selectedIds[a.id],
+      onOpen:this.openDrawer(a.id), onToggleSelect:this.toggleSelect(a.id)
+    }));
+    const q = s.apptSearch.trim().toLowerCase();
+    const filtered = appts.filter(a =>
+      (q==='' || a.title.toLowerCase().includes(q) || a.org.toLowerCase().includes(q)) &&
+      (s.apptStatusFilter==='all' || a.status===s.apptStatusFilter) &&
+      (s.apptOrgFilter==='all' || a.org===s.apptOrgFilter)
+    );
+    const pageSize=5;
+    const totalPages=Math.max(1,Math.ceil(filtered.length/pageSize));
+    const page=Math.min(s.apptPage,totalPages);
+    const paged = filtered.slice((page-1)*pageSize, page*pageSize);
+    const selectedCount = Object.keys(s.selectedIds).length;
+    const allOnPageSelected = paged.length>0 && paged.every(a=>a.selected);
+    const orgNames = [...new Set(this.organizations.map(o=>o.name))];
+
+    // ---- charts ----
+    const maxMonthly = Math.max(...this.monthlyRaw.map(m=>m.count),1);
+    const monthlyData = this.monthlyRaw.map(m=>({label:m.label, count:m.count, heightPct: Math.max(4, Math.round(m.count/maxMonthly*100)) + '%'}));
+    const maxYearly = Math.max(...this.yearlyRaw.map(y=>y.count),1);
+    const yearlyData = this.yearlyRaw.map(y=>({label:y.label, heightPct: Math.round(y.count/maxYearly*100)+'%'}));
+    const statusCounts = {};
+    appts.forEach(a=>{ statusCounts[a.status]=(statusCounts[a.status]||0)+1; });
+    const statusColorsMap = {'Tamamlandı':'#22C55E','Planlandı':'#2563EB','Devam Ediyor':'#F59E0B','İptal Edildi':'#EF4444'};
+    const totalAppts = appts.length;
+    let acc=0;
+    const gradientStops=[];
+    const statusDist = Object.keys(statusColorsMap).map(k=>{
+      const cnt = statusCounts[k]||0;
+      const pct = totalAppts? Math.round(cnt/totalAppts*100):0;
+      const start=acc; acc+=pct;
+      gradientStops.push(`${statusColorsMap[k]} ${start}% ${acc}%`);
+      return {label:k, color:statusColorsMap[k], pct};
+    });
+    if(acc<100) gradientStops.push(`${c.border} ${acc}% 100%`);
+    const statusDonutGradient = `conic-gradient(${gradientStops.join(',')})`;
+    const maxOrgDist = Math.max(...this.orgDistributionRaw.map(o=>o.count),1);
+    const orgDistribution = this.orgDistributionRaw.map(o=>({name:o.name, count:o.count, pct:Math.round(o.count/maxOrgDist*100)+'%'}));
+    const topOrgs = orgDistribution;
+    const maxStaff = Math.max(...this.topStaffRaw.map(t=>t.count),1);
+    const topStaff = this.topStaffRaw.map(t=>({name:t.name, count:t.count, pct:Math.round(t.count/maxStaff*100)+'%'}));
+    const maxHeat = Math.max(...this.heatmapRaw.map(h=>h.v),1);
+    const heatmap = this.heatmapRaw.map(h=>{
+      const alpha = 0.12 + (h.v/maxHeat)*0.75;
+      return {color:`rgba(37,99,235,${alpha.toFixed(2)})`, label:`${this.weekdayLabels[h.d]} ${9+h.h}:00`};
+    });
+
+    // ---- hero stats ----
+    const todayCount = 2;
+    const completionRate = totalAppts? Math.round((statusCounts['Tamamlandı']||0)/totalAppts*100):0;
+    const heroStats = [
+      {label:'Toplam Toplantı', value: totalAppts, trend:`+${this.monthlyRaw[6].count-this.monthlyRaw[5].count>=0?'':''}bu ay ${this.monthlyRaw[6].count}`, trendColor:c.success},
+      {label:'Yaklaşan Randevular', value: filtered.filter(a=>a.status==='Planlandı').length, trend:'bu hafta 3 tanesi', trendColor:c.accent},
+      {label:'Bekleyen Görevler', value: this.tasks.filter(t=>t.status!=='done').length, trend:'2 tanesi acil', trendColor:c.warning},
+      {label:'Tamamlanan Görevler', value: 18, trend:'bu ay +6', trendColor:c.success}
+    ];
+    const widgets = [
+      {label:'Bugünkü Randevular', value:todayCount},
+      {label:'Bu Hafta', value:4},
+      {label:'Bu Ay', value:this.monthlyRaw[6].count},
+      {label:'Toplam Randevu', value:totalAppts},
+      {label:'İptal Oranı', value:`%${totalAppts?Math.round((statusCounts['İptal Edildi']||0)/totalAppts*100):0}`},
+      {label:'Tamamlanma Oranı', value:`%${completionRate}`},
+      {label:'Aktif Kurum', value:this.organizations.length},
+      {label:'Toplam Kişi', value:this.contacts.length}
+    ];
+    const quickActions = [
+      {label:'Yeni Randevu', onClick:this.newAppointment},
+      {label:'Yeni Kişi', onClick:this.newContact},
+      {label:'Yeni Kurum', onClick:this.newOrg},
+      {label:'Yeni Görev', onClick:this.newTask},
+      {label:'Takvimi Aç', onClick:this.setTab('calendar')}
+    ];
+
+    // ---- contacts ----
+    const contactColors = ['#2563EB','#8B5CF6','#22C55E','#F59E0B','#0EA5E9','#EF4444'];
+    const cq = s.contactSearch.trim().toLowerCase();
+    const filteredContacts = this.contacts
+      .filter(p => cq==='' || p.name.toLowerCase().includes(cq) || p.company.toLowerCase().includes(cq))
+      .map((p,i)=>({...p, initials:p.name.split(' ').map(w=>w[0]).join(''), color:contactColors[i%contactColors.length], onOpen:this.openContact(p.id)}));
+
+    // ---- orgs ----
+    const organizations = this.organizations.map(o=>({...o, onOpen:this.openOrg(o.id)}));
+
+    // ---- calendar ----
+    const cal = this.buildCalendar(s.calendarMonthOffset);
+    const eventsByDate = {};
+    this.appointmentsFull.forEach(a=>{ (eventsByDate[a.dateISO] = eventsByDate[a.dateISO]||[]).push(a); });
+    const calendarCells = cal.cells.map(cell=>{
+      const evs = (cell.iso && eventsByDate[cell.iso]) || [];
+      return {
+        day:cell.day, opacity: cell.otherMonth? '0.35':'1',
+        dayColor: cell.otherMonth? c.textSecondary : c.textPrimary,
+        onClick: cell.iso ? this.selectDay(cell.iso) : (()=>{}),
+        events: evs.slice(0,2).map(ev=>({title:ev.title, bg:cal.evColors[ev.status].bg, color:cal.evColors[ev.status].color}))
+      };
+    });
+    const calendarViews = ['Gün','Hafta','Ay','Ajanda'].map(v=>({
+      label:v, onClick:this.setCalendarView(v),
+      style:`padding:6px 13px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;background:${s.calendarView===v?c.primary:'transparent'};color:${s.calendarView===v?'#fff':c.textSecondary}`
+    }));
+    const weekCells = this.buildWeek(s.selectedDayIso, cal.evColors, eventsByDate, c);
+    const sortedAppts = [...this.appointmentsFull].sort((a,b)=>a.dateISO.localeCompare(b.dateISO));
+    const agendaList = sortedAppts.map(a=>({
+      id:a.id, title:a.title, dateDisplay:a.dateDisplay, time:a.time, org:a.org,
+      statusBg:a._statusMeta.bg, statusColor:a._statusMeta.color, status:a.status, onOpen:this.openDrawer(a.id)
+    }));
+    const dayAppts = this.appointmentsFull.filter(a=>a.dateISO===s.selectedDayIso).map(a=>({
+      id:a.id, title:a.title, time:a.time, org:a.org, location:a.location,
+      statusBg:a._statusMeta.bg, statusColor:a._statusMeta.color, status:a.status, onOpen:this.openDrawer(a.id)
+    }));
+    const selectedDayLabel = new Date(s.selectedDayIso+'T00:00:00').toLocaleDateString('tr-TR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+    // ---- drawer ----
+    const selectedApptRaw = this.appointmentsFull.find(a=>a.id===s.selectedApptId);
+    const selectedAppt = selectedApptRaw ? {...selectedApptRaw, statusBg:selectedApptRaw._statusMeta.bg, statusColor:selectedApptRaw._statusMeta.color} : {title:'',dateDisplay:'',time:'',location:'',status:'',statusBg:'',statusColor:'',participants:[]};
+    const drawerTabDefs = [['notlar','Notlar'],['dosyalar','Dosyalar'],['yorumlar','Yorumlar'],['katilimcilar','Katılımcılar'],['timeline','Timeline'],['hatirlaticilar','Hatırlatıcılar'],['mail','Mail'],['durum','Durum Geçmişi']];
+    const drawerTabs = drawerTabDefs.map(([key,label])=>({
+      label, onClick:this.setDrawerTab(key),
+      style:`padding:8px 12px;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid ${s.drawerTab===key?c.accent:'transparent'};color:${s.drawerTab===key?c.accent:c.textSecondary}`
+    }));
+    const isDrawerTab = Object.fromEntries(drawerTabDefs.map(([key])=>[key, s.drawerTab===key]));
+
+    const selectedContactRaw = this.contacts.find(p=>p.id===s.selectedContactId);
+    const selectedContact = selectedContactRaw ? {...selectedContactRaw, initials:selectedContactRaw.name.split(' ').map(w=>w[0]).join(''), color:'#2563EB'} : {name:'',position:'',company:'',phone:'',email:'',lastContact:'',lastCall:'',notes:''};
+    const selectedOrg = this.organizations.find(o=>o.id===s.selectedOrgId) || {name:'',sector:'',logoLetter:'',contactPerson:'',phone:'',email:'',address:'',totalMeetings:0,totalAppointments:0};
+
+    // ---- global search ----
+    const gq = s.globalQuery.trim().toLowerCase();
+    let globalResults = [];
+    if(gq){
+      globalResults = [
+        ...this.contacts.filter(p=>p.name.toLowerCase().includes(gq)).map(p=>({label:p.name, type:'Kişi', onClick:()=>{this.setState({searchOpen:false}); this.openContact(p.id)();}})),
+        ...this.organizations.filter(o=>o.name.toLowerCase().includes(gq)).map(o=>({label:o.name, type:'Kurum', onClick:()=>{this.setState({searchOpen:false}); this.openOrg(o.id)();}})),
+        ...this.appointmentsFull.filter(a=>a.title.toLowerCase().includes(gq)).map(a=>({label:a.title, type:'Randevu', onClick:()=>{this.setState({searchOpen:false}); this.setTab('appointments')(); this.openDrawer(a.id)();}}))
+      ].slice(0,8);
+    }
+
+    // ---- settings toggles ----
+    const mkSwitch = (on) => ({
+      switchStyle:`width:40px;height:22px;border-radius:12px;cursor:pointer;background:${on?c.accent:c.border};position:relative;transition:background .15s`,
+      knobStyle:`width:18px;height:18px;border-radius:50%;background:#fff;position:relative;top:2px;left:${on?'20px':'2px'};transition:left .15s`
+    });
+    const notifSettings = [
+      {label:'E-posta Bildirimleri', ...mkSwitch(s.notif.mail), onToggle:this.toggleNotif('mail')},
+      {label:'SMS Bildirimleri', ...mkSwitch(s.notif.sms), onToggle:this.toggleNotif('sms')},
+      {label:'Push Bildirimleri', ...mkSwitch(s.notif.push), onToggle:this.toggleNotif('push')}
+    ];
+    const darkSw = mkSwitch(s.darkMode);
+    const twoFaSw = mkSwitch(s.twoFa);
+    const inputStyle = `width:100%;box-sizing:border-box;padding:10px 13px;border-radius:9px;border:1px solid ${c.border};background:${c.bg};color:${c.textPrimary};font-size:13px;outline:none`;
+    const inputStyleHalf = inputStyle + ';flex:1';
+
+    return {
+      c, navItems, pageTitle: pageTitles[s.activeTab], themeIcon: s.darkMode?'☀️':'🌙',
+      isDashboard:s.activeTab==='dashboard', isAppointments:s.activeTab==='appointments', isContacts:s.activeTab==='contacts',
+      isOrgs:s.activeTab==='orgs', isCalendar:s.activeTab==='calendar', isReports:s.activeTab==='reports', isSettings:s.activeTab==='settings',
+      todayLabel:'23 Temmuz 2026, Perşembe', stats:{today:todayCount, completionRate},
+      quickActions, heroStats, widgets,
+      monthlyData, yearlyData, statusDist, statusDonutGradient, orgDistribution, heatmap, activities: this.activities,
+      apptSearch:s.apptSearch, apptStatusFilter:s.apptStatusFilter, apptOrgFilter:s.apptOrgFilter, orgNames,
+      onApptSearch:this.onApptSearch, onApptStatus:this.onApptStatus, onApptOrg:this.onApptOrg,
+      pagedAppointments:paged, filteredCount:filtered.length, apptPage:page, totalPages,
+      pageRangeLabel: filtered.length? `${(page-1)*pageSize+1}-${Math.min(page*pageSize,filtered.length)}`:'0',
+      prevPage:this.prevPage, nextPage:this.nextPage, allOnPageSelected,
+      toggleSelectAll: () => this.setState(s2=>{ const sel={...s2.selectedIds}; paged.forEach(a=>{ if(allOnPageSelected) delete sel[a.id]; else sel[a.id]=true; }); return {selectedIds:sel}; }),
+      hasSelection: selectedCount>0, selectedCount, bulkComplete:this.bulkComplete, bulkCancel:this.bulkCancel, clearSelection:this.clearSelection,
+      exportAs:this.exportAs, newAppointment:this.newAppointment,
+      contactSearch:s.contactSearch, onContactSearch:this.onContactSearch, filteredContacts, newContact:this.newContact,
+      organizations, orgCount:this.organizations.length, newOrg:this.newOrg,
+      monthLabel: cal.monthLabel.charAt(0).toUpperCase()+cal.monthLabel.slice(1), prevMonth:this.prevMonth, nextMonth:this.nextMonth,
+      calendarViews, weekdayLabels:this.weekdayLabels, calendarCells,
+      isCalMonth:s.calendarView==='Ay', isCalWeek:s.calendarView==='Hafta', isCalDay:s.calendarView==='Gün', isCalAgenda:s.calendarView==='Ajanda',
+      weekCells, agendaList, dayAppts, selectedDayLabel,
+      topOrgs, topStaff, durationByType: this.durationByType,
+      drawerOpen: !!s.selectedApptId, selectedAppt, drawerTabs, isDrawerTab, closeDrawer:this.closeDrawer,
+      contactDrawerOpen: !!s.selectedContactId, selectedContact, closeContact:this.closeContact,
+      orgDrawerOpen: !!s.selectedOrgId, selectedOrg, closeOrg:this.closeOrg,
+      searchOpen:s.searchOpen, openSearch:this.openSearch, closeSearch:this.closeSearch, stopProp:this.stopProp,
+      globalQuery:s.globalQuery, onGlobalQuery:this.onGlobalQuery, globalResults,
+      toast:s.toast,
+      toggleDark:this.toggleDark,
+      darkSwitchStyle:darkSw.switchStyle, darkKnobStyle:darkSw.knobStyle,
+      notifSettings,
+      twoFaSwitchStyle:twoFaSw.switchStyle, twoFaKnobStyle:twoFaSw.knobStyle, toggle2fa:this.toggle2fa,
+      inputStyle, inputStyleHalf,
+      activeModal:s.activeModal, closeModal:this.closeModal, openPasswordModal:this.openPasswordModal,
+      isModalAppt:s.activeModal==='appointment', isModalContact:s.activeModal==='contact', isModalOrg:s.activeModal==='org', isModalTask:s.activeModal==='task', isModalPassword:s.activeModal==='password',
+      apptForm:s.apptForm, apptOnTitle:this.updateForm('apptForm','title'), apptOnOrg:this.updateForm('apptForm','org'), apptOnDate:this.updateForm('apptForm','date'), apptOnTime:this.updateForm('apptForm','time'), apptOnLocation:this.updateForm('apptForm','location'), apptOnPriority:this.updateForm('apptForm','priority'), submitAppointment:this.submitAppointment,
+      contactForm:s.contactForm, contactOnName:this.updateForm('contactForm','name'), contactOnPosition:this.updateForm('contactForm','position'), contactOnCompany:this.updateForm('contactForm','company'), contactOnPhone:this.updateForm('contactForm','phone'), contactOnEmail:this.updateForm('contactForm','email'), submitContact:this.submitContact,
+      orgForm:s.orgForm, orgOnName:this.updateForm('orgForm','name'), orgOnSector:this.updateForm('orgForm','sector'), orgOnContact:this.updateForm('orgForm','contactPerson'), orgOnPhone:this.updateForm('orgForm','phone'), orgOnEmail:this.updateForm('orgForm','email'), orgOnAddress:this.updateForm('orgForm','address'), submitOrg:this.submitOrg,
+      taskForm:s.taskForm, taskOnTitle:this.updateForm('taskForm','title'), taskOnDeadline:this.updateForm('taskForm','deadline'), taskOnPriority:this.updateForm('taskForm','priority'), submitTask:this.submitTask,
+      passwordForm:s.passwordForm, pwOnCurrent:this.updateForm('passwordForm','current'), pwOnNext:this.updateForm('passwordForm','next'), pwOnConfirm:this.updateForm('passwordForm','confirm'), submitPassword:this.submitPassword
+    };
+  }
+}
+</script>
+</body>
+</html>
