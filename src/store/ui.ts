@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 
 type Toast = { id: number; message: string }
-export type ModalKey = 'appointment' | 'contact' | 'organization' | 'task' | null
+export type ModalKey =
+  'appointment' | 'contact' | 'organization' | 'task' | 'edit-contact' | 'edit-organization' | null
 
 interface UiState {
   searchOpen: boolean
@@ -9,12 +10,21 @@ interface UiState {
   closeSearch: () => void
 
   activeModal: ModalKey
-  openModal: (key: ModalKey) => void
+  editTargetId: number | null
+  openModal: (key: ModalKey, editTargetId?: number) => void
   closeModal: () => void
 
   drawerApptId: number | null
   openDrawer: (id: number) => void
   closeDrawer: () => void
+
+  contactDrawerId: number | null
+  openContactDrawer: (id: number) => void
+  closeContactDrawer: () => void
+
+  orgDrawerId: number | null
+  openOrgDrawer: (id: number) => void
+  closeOrgDrawer: () => void
 
   toasts: Toast[]
   showToast: (message: string) => void
@@ -29,12 +39,21 @@ export const useUiStore = create<UiState>((set) => ({
   closeSearch: () => set({ searchOpen: false }),
 
   activeModal: null,
-  openModal: (key) => set({ activeModal: key }),
-  closeModal: () => set({ activeModal: null }),
+  editTargetId: null,
+  openModal: (key, editTargetId) => set({ activeModal: key, editTargetId: editTargetId ?? null }),
+  closeModal: () => set({ activeModal: null, editTargetId: null }),
 
   drawerApptId: null,
   openDrawer: (id) => set({ drawerApptId: id }),
   closeDrawer: () => set({ drawerApptId: null }),
+
+  contactDrawerId: null,
+  openContactDrawer: (id) => set({ contactDrawerId: id }),
+  closeContactDrawer: () => set({ contactDrawerId: null }),
+
+  orgDrawerId: null,
+  openOrgDrawer: (id) => set({ orgDrawerId: id }),
+  closeOrgDrawer: () => set({ orgDrawerId: null }),
 
   toasts: [],
   showToast: (message) => {

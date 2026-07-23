@@ -44,3 +44,35 @@ export async function createContact(_state: ActionState, formData: FormData): Pr
   revalidatePath('/contacts')
   return { success: true }
 }
+
+export async function updateContact(
+  id: number,
+  _state: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const parsed = schema.safeParse({
+    name: formData.get('name'),
+    position: formData.get('position'),
+    company_id: formData.get('company_id'),
+    phone: formData.get('phone'),
+    email: formData.get('email'),
+  })
+  if (!parsed.success) return { error: parsed.error.issues[0].message }
+
+  const { name, position, company_id, phone, email } = parsed.data
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('contacts')
+    .update({
+      name,
+      position: position || null,
+      company_id: company_id ? Number(company_id) : null,
+      phone: phone || null,
+      email: email || null,
+    })
+    .eq('id', id)
+  if (error) return { error: 'Kişi güncellenemedi.' }
+
+  revalidatePath('/contacts')
+  return { success: true }
+}

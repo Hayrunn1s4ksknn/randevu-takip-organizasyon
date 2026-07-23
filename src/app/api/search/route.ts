@@ -15,24 +15,9 @@ export async function GET(request: NextRequest) {
   ])
 
   const results = [
-    ...(contacts.data ?? []).map((c) => ({
-      id: c.id,
-      label: c.name,
-      type: 'Kişi',
-      href: `/contacts?open=${c.id}`,
-    })),
-    ...(organizations.data ?? []).map((o) => ({
-      id: o.id,
-      label: o.name,
-      type: 'Kurum',
-      href: `/organizations?open=${o.id}`,
-    })),
-    ...(appointments.data ?? []).map((a) => ({
-      id: a.id,
-      label: a.title,
-      type: 'Randevu',
-      href: `/appointments?open=${a.id}`,
-    })),
+    ...(contacts.data ?? []).map((c) => ({ id: c.id, label: c.name, type: 'Kişi' })),
+    ...(organizations.data ?? []).map((o) => ({ id: o.id, label: o.name, type: 'Kurum' })),
+    ...(appointments.data ?? []).map((a) => ({ id: a.id, label: a.title, type: 'Randevu' })),
   ].slice(0, 8)
 
   return NextResponse.json({ results })

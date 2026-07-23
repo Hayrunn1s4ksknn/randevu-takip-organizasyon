@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { useUiStore } from '@/store/ui'
 
-type SearchResult = { id: number; label: string; type: 'Kişi' | 'Kurum' | 'Randevu'; href: string }
+type SearchResult = { id: number; label: string; type: 'Kişi' | 'Kurum' | 'Randevu' }
 
 function SearchPaletteContent({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState('')
@@ -53,8 +53,12 @@ function SearchPaletteContent({ onClose }: { onClose: () => void }) {
                 if (r.type === 'Randevu') {
                   router.push('/appointments')
                   useUiStore.getState().openDrawer(r.id)
+                } else if (r.type === 'Kişi') {
+                  router.push('/contacts')
+                  useUiStore.getState().openContactDrawer(r.id)
                 } else {
-                  router.push(r.href)
+                  router.push('/organizations')
+                  useUiStore.getState().openOrgDrawer(r.id)
                 }
               }}
               className="flex cursor-pointer justify-between rounded-[9px] px-3.5 py-[11px] text-[13.5px] hover:bg-bg"
