@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import { Topbar } from '@/components/topbar'
 import { SearchPalette } from '@/components/search-palette'
 import { ToastContainer } from '@/components/toast-container'
+import { RealtimeNotifier } from '@/components/realtime-notifier'
 import { QuickActionModals } from '@/components/quick-action-modals'
 import { AppointmentDrawer } from '@/features/appointments/appointment-drawer'
 import { ContactDrawer } from '@/features/contacts/contact-drawer'
@@ -14,6 +15,7 @@ import { Fab } from '@/components/fab'
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
   '/appointments': 'Randevular',
+  '/tasks': 'Görevler',
   '/contacts': 'Kişiler',
   '/organizations': 'Kurumlar',
   '/calendar': 'Takvim',
@@ -26,11 +28,13 @@ export function AppShellClient({
   fullName,
   isDark,
   orgOptions,
+  userId,
 }: {
   children: React.ReactNode
   fullName: string
   isDark: boolean
   orgOptions: { id: number; name: string }[]
+  userId: string
 }) {
   const pathname = usePathname()
   const pageTitle = Object.entries(PAGE_TITLES).find(([prefix]) => pathname.startsWith(prefix))?.[1] ?? ''
@@ -41,6 +45,7 @@ export function AppShellClient({
       <div className="relative flex-1 overflow-auto p-4 pb-20 md:p-7">{children}</div>
       <SearchPalette />
       <ToastContainer />
+      <RealtimeNotifier userId={userId} />
       <QuickActionModals orgOptions={orgOptions} />
       <AppointmentDrawer />
       <ContactDrawer orgOptions={orgOptions} />

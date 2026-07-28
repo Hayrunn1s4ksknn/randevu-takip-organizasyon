@@ -22,7 +22,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-screen w-full overflow-hidden bg-bg text-text-primary">
       <Sidebar fullName={fullName} roleLabel={roleLabel} />
-      <AppShellClient fullName={fullName} isDark={profile?.dark_mode ?? false} orgOptions={orgOptions}>
+      <AppShellClient
+        fullName={fullName}
+        isDark={profile?.dark_mode ?? false}
+        orgOptions={orgOptions}
+        userId={user.id}
+      >
         {children}
       </AppShellClient>
     </div>
