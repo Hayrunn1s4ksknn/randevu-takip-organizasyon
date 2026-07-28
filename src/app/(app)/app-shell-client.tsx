@@ -20,18 +20,21 @@ const PAGE_TITLES: Record<string, string> = {
   '/organizations': 'Kurumlar',
   '/calendar': 'Takvim',
   '/reports': 'Raporlar',
+  '/settings/users': 'Kullanıcılar',
   '/settings': 'Ayarlar',
 }
 
 export function AppShellClient({
   children,
   fullName,
+  email,
   isDark,
   orgOptions,
   userId,
 }: {
   children: React.ReactNode
   fullName: string
+  email: string
   isDark: boolean
   orgOptions: { id: number; name: string }[]
   userId: string
@@ -41,7 +44,7 @@ export function AppShellClient({
 
   return (
     <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-      <Topbar pageTitle={pageTitle} isDark={isDark} fullName={fullName} />
+      <Topbar pageTitle={pageTitle} isDark={isDark} fullName={fullName} email={email} />
       <div className="relative flex-1 overflow-auto p-4 pb-20 md:p-7">{children}</div>
       <SearchPalette />
       <ToastContainer />

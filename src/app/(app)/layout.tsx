@@ -24,6 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <Sidebar fullName={fullName} roleLabel={roleLabel} />
       <AppShellClient
         fullName={fullName}
+        email={user.email ?? ''}
         isDark={profile?.dark_mode ?? false}
         orgOptions={orgOptions}
         userId={user.id}

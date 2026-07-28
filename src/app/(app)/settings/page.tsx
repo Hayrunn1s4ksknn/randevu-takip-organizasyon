@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getCurrentUserAndProfile } from '@/services/profile'
 import { DarkModeToggle } from '@/features/settings/dark-mode-toggle'
@@ -44,6 +45,21 @@ export default async function SettingsPage() {
           E-posta/SMS/Push bildirim tercihleri, 2FA ve şifre değiştirme Faz 2&apos;de bu sayfaya eklenecek.
         </p>
       </section>
+
+      {profile?.role === 'admin' && (
+        <section className="rounded-2xl border border-border bg-surface-solid p-[22px]">
+          <div className="mb-1 text-[14.5px] font-bold">Kullanıcı Yönetimi</div>
+          <p className="mb-3 text-[13px] text-text-secondary">
+            Yeni kullanıcı ekle, rol değiştir veya bir hesabı devre dışı bırak.
+          </p>
+          <Link
+            href="/settings/users"
+            className="inline-flex rounded-[9px] bg-primary px-4 py-2.5 text-[12.5px] font-bold text-white"
+          >
+            Kullanıcıları Yönet
+          </Link>
+        </section>
+      )}
     </div>
   )
 }

@@ -3,25 +3,22 @@
 import { useTransition } from 'react'
 import { useUiStore } from '@/store/ui'
 import { toggleDarkMode } from '@/features/settings/actions'
+import { UserMenu } from '@/components/user-menu'
 
 export function Topbar({
   pageTitle,
   isDark,
   fullName,
+  email,
 }: {
   pageTitle: string
   isDark: boolean
   fullName: string
+  email: string
 }) {
   const openSearch = useUiStore((s) => s.openSearch)
   const openMobileNav = useUiStore((s) => s.openMobileNav)
   const [pending, startTransition] = useTransition()
-  const initials = fullName
-    .split(' ')
-    .map((w) => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
 
   return (
     <div className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-surface-solid px-4 md:px-7">
@@ -53,9 +50,7 @@ export function Topbar({
         >
           {isDark ? '☀️' : '🌙'}
         </button>
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-accent text-[13px] font-bold text-white">
-          {initials || '?'}
-        </div>
+        <UserMenu fullName={fullName} email={email} />
       </div>
     </div>
   )
