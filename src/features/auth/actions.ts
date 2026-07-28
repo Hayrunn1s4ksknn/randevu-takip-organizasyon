@@ -3,6 +3,7 @@
 import { z } from 'zod'
 import { redirect } from 'next/navigation'
 import { createClient, THIRTY_DAYS } from '@/lib/supabase/server'
+import { isRateLimited, recordAuthAttempt } from '@/lib/rate-limit'
 
 export type ActionState = { error?: string } | undefined
 
@@ -22,11 +23,18 @@ export async function login(_state: ActionState, formData: FormData): Promise<Ac
     return { error: parsed.error.issues[0].message }
   }
 
+  const { email, password } = parsed.data
+  const { limited, windowMinutes } = await isRateLimited(email, 'login')
+  if (limited) {
+    return { error: `Çok fazla başarısız deneme. Lütfen ${windowMinutes} dakika sonra tekrar dene.` }
+  }
+
   const remember = formData.get('remember') === 'on'
   let redirectTarget: string | null = null
   try {
     const supabase = await createClient(remember ? { rememberMaxAgeSeconds: THIRTY_DAYS } : undefined)
-    const { error } = await supabase.auth.signInWithPassword(parsed.data)
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    await recordAuthAttempt(email, 'login', !error)
     if (error) return { error: 'E-posta veya şifre hatalı.' }
 
     const redirectTo = formData.get('redirectTo')
@@ -47,12 +55,19 @@ export async function requestPasswordReset(_state: ActionState, formData: FormDa
     return { error: parsed.error.issues[0].message }
   }
 
+  const { email } = parsed.data
+  const { limited, windowMinutes } = await isRateLimited(email, 'password_reset')
+  if (limited) {
+    return { error: `Çok fazla istek. Lütfen ${windowMinutes} dakika sonra tekrar dene.` }
+  }
+
   try {
     const supabase = await createClient()
     const origin = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'
-    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${origin}/reset-password`,
     })
+    await recordAuthAttempt(email, 'password_reset', !error)
     if (error) return { error: 'Sıfırlama e-postası gönderilemedi.' }
   } catch {
     return { error: CONNECTION_ERROR }

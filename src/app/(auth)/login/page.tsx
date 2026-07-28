@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { LoginForm } from '@/features/auth/login-form'
 
 export default async function LoginPage({
@@ -17,6 +18,12 @@ export default async function LoginPage({
         </p>
       )}
       <LoginForm redirectTo={redirectTo ?? '/dashboard'} />
+      <Link
+        href="/privacy"
+        className="mt-5 block text-center text-[11.5px] text-text-secondary hover:underline"
+      >
+        Gizlilik Politikası
+      </Link>
     </div>
   )
 }

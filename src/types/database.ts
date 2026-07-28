@@ -271,6 +271,23 @@ type AppointmentFiles = {
   ]
 }
 
+type AuthAttempts = {
+  Row: {
+    id: number
+    email: string
+    action: 'login' | 'password_reset'
+    success: boolean
+    attempted_at: string
+  }
+  Insert: Partial<AuthAttempts['Row']> & {
+    email: string
+    action: 'login' | 'password_reset'
+    success: boolean
+  }
+  Update: Partial<AuthAttempts['Row']>
+  Relationships: []
+}
+
 type Activities = {
   Row: { id: number; user_id: string | null; action_type: string; description: string; created_at: string }
   Insert: Partial<Activities['Row']> & { action_type: string; description: string }
@@ -300,6 +317,7 @@ export interface Database {
       appointment_files: AppointmentFiles
       tasks: Tasks
       activities: Activities
+      auth_attempts: AuthAttempts
     }
     Views: Record<string, never>
     Functions: Record<string, never>
