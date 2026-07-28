@@ -10,37 +10,43 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const supabase = await createClient()
 
-  const [appointmentRes, participantsRes, notesRes, commentsRes, historyRes, filesRes] = await Promise.all([
-    supabase
-      .from('appointments')
-      .select('id, title, date, time, location, status, priority, organizations(name)')
-      .eq('id', appointmentId)
-      .single(),
-    supabase
-      .from('appointment_participants')
-      .select('contacts(id, name)')
-      .eq('appointment_id', appointmentId),
-    supabase
-      .from('appointment_notes')
-      .select('id, body, created_at, profiles(full_name)')
-      .eq('appointment_id', appointmentId)
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('appointment_comments')
-      .select('id, body, created_at, profiles(full_name)')
-      .eq('appointment_id', appointmentId)
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('appointment_status_history')
-      .select('id, from_status, to_status, changed_at, profiles(full_name)')
-      .eq('appointment_id', appointmentId)
-      .order('changed_at', { ascending: false }),
-    supabase
-      .from('appointment_files')
-      .select('id, file_name, size_bytes, mime_type, created_at, profiles(full_name)')
-      .eq('appointment_id', appointmentId)
-      .order('created_at', { ascending: false }),
-  ])
+  const [appointmentRes, participantsRes, notesRes, commentsRes, historyRes, filesRes, emailsRes] =
+    await Promise.all([
+      supabase
+        .from('appointments')
+        .select('id, title, date, time, location, status, priority, organizations(name, email)')
+        .eq('id', appointmentId)
+        .single(),
+      supabase
+        .from('appointment_participants')
+        .select('contacts(id, name)')
+        .eq('appointment_id', appointmentId),
+      supabase
+        .from('appointment_notes')
+        .select('id, body, created_at, profiles(full_name)')
+        .eq('appointment_id', appointmentId)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('appointment_comments')
+        .select('id, body, created_at, profiles(full_name)')
+        .eq('appointment_id', appointmentId)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('appointment_status_history')
+        .select('id, from_status, to_status, changed_at, profiles(full_name)')
+        .eq('appointment_id', appointmentId)
+        .order('changed_at', { ascending: false }),
+      supabase
+        .from('appointment_files')
+        .select('id, file_name, size_bytes, mime_type, created_at, profiles(full_name)')
+        .eq('appointment_id', appointmentId)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('appointment_emails')
+        .select('id, to_email, subject, body, kind, sent_at, profiles(full_name)')
+        .eq('appointment_id', appointmentId)
+        .order('sent_at', { ascending: false }),
+    ])
 
   if (appointmentRes.error || !appointmentRes.data) {
     return NextResponse.json({ error: 'not found' }, { status: 404 })
@@ -53,5 +59,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     comments: commentsRes.data ?? [],
     statusHistory: historyRes.data ?? [],
     files: filesRes.data ?? [],
+    emails: emailsRes.data ?? [],
   })
 }

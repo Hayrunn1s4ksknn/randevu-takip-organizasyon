@@ -36,8 +36,13 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname
   const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route))
+  // API routes do their own auth (session cookie or a bearer token, e.g. the
+  // cron endpoint) and must return JSON/status codes, never an HTML redirect
+  // — a fetch() following a 307 to /login would try to JSON.parse the login
+  // page's HTML.
+  const isApiRoute = pathname.startsWith('/api/')
 
-  if (!user && !isPublicRoute) {
+  if (!user && !isPublicRoute && !isApiRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirectTo', pathname)

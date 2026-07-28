@@ -96,6 +96,7 @@ type Appointments = {
     created_by: string | null
     created_at: string
     updated_at: string
+    reminder_sent_at: string | null
   }
   Insert: Partial<Appointments['Row']> & { title: string; date: string }
   Update: Partial<Appointments['Row']>
@@ -288,6 +289,43 @@ type AuthAttempts = {
   Relationships: []
 }
 
+type AppointmentEmails = {
+  Row: {
+    id: number
+    appointment_id: number
+    sent_by: string | null
+    to_email: string
+    subject: string
+    body: string
+    kind: 'manual' | 'confirmation' | 'reminder'
+    sent_at: string
+  }
+  Insert: Partial<AppointmentEmails['Row']> & {
+    appointment_id: number
+    to_email: string
+    subject: string
+    body: string
+    kind: 'manual' | 'confirmation' | 'reminder'
+  }
+  Update: Partial<AppointmentEmails['Row']>
+  Relationships: [
+    {
+      foreignKeyName: 'appointment_emails_appointment_id_fkey'
+      columns: ['appointment_id']
+      isOneToOne: false
+      referencedRelation: 'appointments'
+      referencedColumns: ['id']
+    },
+    {
+      foreignKeyName: 'appointment_emails_sent_by_fkey'
+      columns: ['sent_by']
+      isOneToOne: false
+      referencedRelation: 'profiles'
+      referencedColumns: ['id']
+    },
+  ]
+}
+
 type Activities = {
   Row: { id: number; user_id: string | null; action_type: string; description: string; created_at: string }
   Insert: Partial<Activities['Row']> & { action_type: string; description: string }
@@ -315,6 +353,7 @@ export interface Database {
       appointment_comments: AppointmentComments
       appointment_status_history: AppointmentStatusHistory
       appointment_files: AppointmentFiles
+      appointment_emails: AppointmentEmails
       tasks: Tasks
       activities: Activities
       auth_attempts: AuthAttempts

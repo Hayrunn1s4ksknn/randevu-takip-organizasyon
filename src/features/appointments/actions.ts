@@ -3,6 +3,7 @@
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { sendEmail } from '@/lib/email'
 import type { AppointmentStatus } from '@/types/database'
 
 export type ActionState = { error?: string; success?: boolean } | undefined
@@ -33,20 +34,61 @@ export async function createAppointment(_state: ActionState, formData: FormData)
     data: { user },
   } = await supabase.auth.getUser()
 
-  const { error } = await supabase.from('appointments').insert({
-    title,
-    org_id: org_id ? Number(org_id) : null,
-    date,
-    time: time || null,
-    location: location || null,
-    priority,
-    created_by: user?.id ?? null,
-  })
-  if (error) return { error: 'Randevu oluşturulamadı.' }
+  const { data: created, error } = await supabase
+    .from('appointments')
+    .insert({
+      title,
+      org_id: org_id ? Number(org_id) : null,
+      date,
+      time: time || null,
+      location: location || null,
+      priority,
+      created_by: user?.id ?? null,
+    })
+    .select('id, org_id')
+    .single()
+  if (error || !created) return { error: 'Randevu oluşturulamadı.' }
 
   revalidatePath('/dashboard')
   revalidatePath('/appointments')
+
+  if (created.org_id) {
+    // Awaited (not fire-and-forget): serverless functions can be frozen right
+    // after the response is sent, which would silently drop an unawaited send.
+    // Failure here must not fail appointment creation, hence the try/catch.
+    try {
+      await sendAppointmentConfirmation(created.id, created.org_id, title, date, time)
+    } catch {
+      // best-effort
+    }
+  }
+
   return { success: true }
+}
+
+async function sendAppointmentConfirmation(
+  appointmentId: number,
+  orgId: number,
+  title: string,
+  date: string,
+  time: string | undefined
+) {
+  const supabase = await createClient()
+  const { data: org } = await supabase.from('organizations').select('name, email').eq('id', orgId).single()
+  if (!org?.email) return
+
+  const formattedDate = new Date(`${date}T00:00:00`).toLocaleDateString('tr-TR')
+  const subject = `Randevu Onayı: ${title}`
+  const body = `<p>Merhaba,</p><p><strong>${title}</strong> randevunuz <strong>${formattedDate}${time ? ` ${time.slice(0, 5)}` : ''}</strong> için oluşturuldu.</p>`
+
+  await sendEmail({ to: org.email, subject, html: body })
+  await supabase.from('appointment_emails').insert({
+    appointment_id: appointmentId,
+    to_email: org.email,
+    subject,
+    body,
+    kind: 'confirmation',
+  })
 }
 
 export async function bulkUpdateAppointmentStatus(ids: number[], status: AppointmentStatus) {
