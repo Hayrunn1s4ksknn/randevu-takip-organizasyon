@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ChangeEvent } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useUiStore } from '@/store/ui'
 import { useSwipeToClose } from '@/hooks/use-swipe-to-close'
@@ -32,6 +32,14 @@ type DrawerData = {
   participants: { id: number; name: string }[]
   notes: { id: number; body: string; created_at: string; profiles: { full_name: string | null } | null }[]
   comments: { id: number; body: string; created_at: string; profiles: { full_name: string | null } | null }[]
+  files: {
+    id: number
+    file_name: string
+    size_bytes: number
+    mime_type: string | null
+    created_at: string
+    profiles: { full_name: string | null } | null
+  }[]
   statusHistory: {
     id: number
     from_status: AppointmentStatus | null
@@ -71,6 +79,91 @@ function ComposeBox({
       >
         Ekle
       </button>
+    </div>
+  )
+}
+
+function formatBytes(bytes: number) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function FilesTab({
+  appointmentId,
+  files,
+  onChanged,
+}: {
+  appointmentId: number
+  files: DrawerData['files']
+  onChanged: () => void
+}) {
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+
+    setUploading(true)
+    setError(null)
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await fetch(`/api/appointments/${appointmentId}/files`, { method: 'POST', body: formData })
+    setUploading(false)
+    if (!res.ok) {
+      const body = await res.json().catch(() => null)
+      setError(body?.error ?? 'Dosya yüklenemedi.')
+      return
+    }
+    onChanged()
+  }
+
+  async function handleDelete(fileId: number) {
+    if (!confirm('Bu dosyayı silmek istediğine emin misin?')) return
+    await fetch(`/api/appointments/${appointmentId}/files/${fileId}`, { method: 'DELETE' })
+    onChanged()
+  }
+
+  return (
+    <div>
+      <label className="mb-4 inline-flex cursor-pointer items-center gap-2 rounded-[9px] bg-primary px-3.5 py-2 text-[12.5px] font-bold text-white">
+        {uploading ? 'Yükleniyor...' : '+ Dosya Yükle'}
+        <input type="file" onChange={handleUpload} disabled={uploading} className="hidden" />
+      </label>
+      {error && <p className="mb-3 text-[12.5px] font-medium text-danger">{error}</p>}
+
+      {files.length === 0 && <p className="text-[13px] text-text-secondary">Henüz dosya yok.</p>}
+      <div className="flex flex-col gap-2.5">
+        {files.map((f) => (
+          <div
+            key={f.id}
+            className="flex items-center justify-between gap-2 rounded-[9px] border border-border p-2.5"
+          >
+            <div className="min-w-0">
+              <a
+                href={`/api/appointments/${appointmentId}/files/${f.id}`}
+                target="_blank"
+                rel="noreferrer"
+                className="block overflow-hidden text-ellipsis whitespace-nowrap text-[13px] font-semibold text-accent hover:underline"
+              >
+                {f.file_name}
+              </a>
+              <div className="text-[11px] text-text-secondary">
+                {formatBytes(f.size_bytes)} · {f.profiles?.full_name ?? 'Sistem'} ·{' '}
+                {new Date(f.created_at).toLocaleDateString('tr-TR')}
+              </div>
+            </div>
+            <button
+              onClick={() => handleDelete(f.id)}
+              className="shrink-0 rounded-[9px] border border-danger px-2.5 py-1 text-[11.5px] font-bold text-danger"
+            >
+              Sil
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -177,10 +270,8 @@ export function AppointmentDrawer() {
             </div>
           )}
 
-          {data && tab === 'dosyalar' && (
-            <p className="text-[13px] text-text-secondary">
-              Dosya yükleme Faz 2&apos;de Supabase Storage ile eklenecek.
-            </p>
+          {data && tab === 'dosyalar' && drawerApptId !== null && (
+            <FilesTab appointmentId={drawerApptId} files={data.files} onChanged={invalidate} />
           )}
 
           {data && tab === 'yorumlar' && (

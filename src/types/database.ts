@@ -235,6 +235,42 @@ type Tasks = {
   ]
 }
 
+type AppointmentFiles = {
+  Row: {
+    id: number
+    appointment_id: number
+    uploaded_by: string | null
+    file_name: string
+    storage_path: string
+    size_bytes: number
+    mime_type: string | null
+    created_at: string
+  }
+  Insert: Partial<AppointmentFiles['Row']> & {
+    appointment_id: number
+    file_name: string
+    storage_path: string
+    size_bytes: number
+  }
+  Update: Partial<AppointmentFiles['Row']>
+  Relationships: [
+    {
+      foreignKeyName: 'appointment_files_appointment_id_fkey'
+      columns: ['appointment_id']
+      isOneToOne: false
+      referencedRelation: 'appointments'
+      referencedColumns: ['id']
+    },
+    {
+      foreignKeyName: 'appointment_files_uploaded_by_fkey'
+      columns: ['uploaded_by']
+      isOneToOne: false
+      referencedRelation: 'profiles'
+      referencedColumns: ['id']
+    },
+  ]
+}
+
 type Activities = {
   Row: { id: number; user_id: string | null; action_type: string; description: string; created_at: string }
   Insert: Partial<Activities['Row']> & { action_type: string; description: string }
@@ -261,6 +297,7 @@ export interface Database {
       appointment_notes: AppointmentNotes
       appointment_comments: AppointmentComments
       appointment_status_history: AppointmentStatusHistory
+      appointment_files: AppointmentFiles
       tasks: Tasks
       activities: Activities
     }

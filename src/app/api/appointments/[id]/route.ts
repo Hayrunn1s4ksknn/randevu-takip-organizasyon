@@ -10,7 +10,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   const supabase = await createClient()
 
-  const [appointmentRes, participantsRes, notesRes, commentsRes, historyRes] = await Promise.all([
+  const [appointmentRes, participantsRes, notesRes, commentsRes, historyRes, filesRes] = await Promise.all([
     supabase
       .from('appointments')
       .select('id, title, date, time, location, status, priority, organizations(name)')
@@ -35,6 +35,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       .select('id, from_status, to_status, changed_at, profiles(full_name)')
       .eq('appointment_id', appointmentId)
       .order('changed_at', { ascending: false }),
+    supabase
+      .from('appointment_files')
+      .select('id, file_name, size_bytes, mime_type, created_at, profiles(full_name)')
+      .eq('appointment_id', appointmentId)
+      .order('created_at', { ascending: false }),
   ])
 
   if (appointmentRes.error || !appointmentRes.data) {
@@ -47,5 +52,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     notes: notesRes.data ?? [],
     comments: commentsRes.data ?? [],
     statusHistory: historyRes.data ?? [],
+    files: filesRes.data ?? [],
   })
 }
