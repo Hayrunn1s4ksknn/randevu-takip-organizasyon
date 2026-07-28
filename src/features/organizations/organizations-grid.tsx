@@ -1,6 +1,7 @@
 'use client'
 
 import { useUiStore } from '@/store/ui'
+import { onActivateKey } from '@/lib/a11y'
 
 type Organization = {
   id: number
@@ -23,7 +24,10 @@ export function OrganizationsGrid({ organizations }: { organizations: Organizati
       {organizations.map((o) => (
         <div
           key={o.id}
+          role="button"
+          tabIndex={0}
           onClick={() => openOrgDrawer(o.id)}
+          onKeyDown={onActivateKey(() => openOrgDrawer(o.id))}
           className="cursor-pointer rounded-2xl border border-border bg-surface-solid p-[18px] hover:border-accent"
         >
           <div className="flex items-center gap-3">

@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUiStore } from '@/store/ui'
 import { STATUS_STYLE, PRIORITY_STYLE } from '@/lib/status-styles'
+import { onActivateKey } from '@/lib/a11y'
 import { bulkUpdateAppointmentStatus } from './actions'
 import type { AppointmentPriority, AppointmentStatus } from '@/types/database'
 
@@ -103,7 +104,10 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
             return (
               <div
                 key={r.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => openDrawer(r.id)}
+                onKeyDown={onActivateKey(() => openDrawer(r.id))}
                 className="grid cursor-pointer grid-cols-[36px_1.6fr_1fr_0.8fr_1fr_1fr_0.9fr] items-center gap-2.5 border-b border-border px-5 py-3.5 text-[13px] last:border-b-0 hover:bg-bg"
               >
                 <input
@@ -151,7 +155,10 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
             return (
               <div
                 key={r.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => openDrawer(r.id)}
+                onKeyDown={onActivateKey(() => openDrawer(r.id))}
                 className="cursor-pointer rounded-2xl border border-border bg-surface-solid p-4"
               >
                 <div className="flex items-start gap-3">

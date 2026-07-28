@@ -2,6 +2,7 @@
 
 import { useUiStore } from '@/store/ui'
 import { STATUS_STYLE } from '@/lib/status-styles'
+import { onActivateKey } from '@/lib/a11y'
 import type { CalendarAppointment } from '@/services/calendar'
 
 export function AppointmentRow({
@@ -16,7 +17,10 @@ export function AppointmentRow({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
       onClick={() => openDrawer(appointment.id)}
+      onKeyDown={onActivateKey(() => openDrawer(appointment.id))}
       className="flex cursor-pointer items-center gap-3.5 border-b border-border px-5 py-3 last:border-b-0 hover:bg-bg"
     >
       {showDate && (

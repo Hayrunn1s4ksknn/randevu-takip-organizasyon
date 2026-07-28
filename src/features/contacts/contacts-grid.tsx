@@ -1,6 +1,7 @@
 'use client'
 
 import { useUiStore } from '@/store/ui'
+import { onActivateKey } from '@/lib/a11y'
 
 const COLORS = ['#2563EB', '#8B5CF6', '#22C55E', '#F59E0B', '#0EA5E9', '#EF4444']
 
@@ -34,7 +35,10 @@ export function ContactsGrid({ contacts }: { contacts: Contact[] }) {
         return (
           <div
             key={c.id}
+            role="button"
+            tabIndex={0}
             onClick={() => openContactDrawer(c.id)}
+            onKeyDown={onActivateKey(() => openContactDrawer(c.id))}
             className="cursor-pointer rounded-2xl border border-border bg-surface-solid p-[18px] hover:border-accent"
           >
             <div className="flex items-center gap-3">

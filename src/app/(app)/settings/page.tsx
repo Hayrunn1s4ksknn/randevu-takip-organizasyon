@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getCurrentUserAndProfile } from '@/services/profile'
 import { DarkModeToggle } from '@/features/settings/dark-mode-toggle'
+import { EditNameForm } from '@/features/settings/edit-name-form'
 
 export default async function SettingsPage() {
   const { user, profile } = await getCurrentUserAndProfile()
@@ -23,8 +24,8 @@ export default async function SettingsPage() {
             {initials}
           </div>
           <div>
-            <div className="text-[15px] font-bold">{fullName}</div>
-            <div className="text-[12.5px] text-text-secondary">{user.email}</div>
+            <EditNameForm initialFullName={fullName} />
+            <div className="mt-1.5 text-[12.5px] text-text-secondary">{user.email}</div>
           </div>
         </div>
       </section>
