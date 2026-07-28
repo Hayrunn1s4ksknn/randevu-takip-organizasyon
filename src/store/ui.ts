@@ -2,7 +2,14 @@ import { create } from 'zustand'
 
 type Toast = { id: number; message: string }
 export type ModalKey =
-  'appointment' | 'contact' | 'organization' | 'task' | 'edit-contact' | 'edit-organization' | null
+  | 'appointment'
+  | 'contact'
+  | 'organization'
+  | 'task'
+  | 'edit-contact'
+  | 'edit-organization'
+  | 'edit-task'
+  | null
 
 interface UiState {
   searchOpen: boolean

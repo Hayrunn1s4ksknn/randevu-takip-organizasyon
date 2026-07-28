@@ -7,6 +7,7 @@ import { useUiStore } from '@/store/ui'
 const NAV_ITEMS = [
   { key: 'dashboard', href: '/dashboard', label: 'Dashboard' },
   { key: 'appointments', href: '/appointments', label: 'Randevular' },
+  { key: 'tasks', href: '/tasks', label: 'Görevler' },
   { key: 'contacts', href: '/contacts', label: 'Kişiler' },
   { key: 'orgs', href: '/organizations', label: 'Kurumlar' },
   { key: 'calendar', href: '/calendar', label: 'Takvim' },
