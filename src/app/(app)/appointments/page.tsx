@@ -4,6 +4,7 @@ import { getOrganizationOptions } from '@/services/organizations'
 import { AppointmentFilters } from '@/features/appointments/appointment-filters'
 import { AppointmentsTable } from '@/features/appointments/appointments-table'
 import { ExportCsvButton } from '@/features/appointments/export-csv-button'
+import { ExportExcelButton } from '@/features/appointments/export-excel-button'
 import { NewAppointmentButton } from '@/features/appointments/new-appointment-button'
 import type { AppointmentStatus } from '@/types/database'
 
@@ -47,6 +48,7 @@ export default async function AppointmentsPage({
         <AppointmentFilters orgOptions={orgOptions} />
         <div className="flex gap-2">
           <ExportCsvButton rows={exportRows} />
+          <ExportExcelButton rows={exportRows} />
           <NewAppointmentButton />
         </div>
       </div>
