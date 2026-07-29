@@ -38,11 +38,49 @@ export async function login(_state: ActionState, formData: FormData): Promise<Ac
     if (error) return { error: 'E-posta veya şifre hatalı.' }
 
     const redirectTo = formData.get('redirectTo')
-    redirectTarget = typeof redirectTo === 'string' && redirectTo ? redirectTo : '/dashboard'
+    const afterLogin = typeof redirectTo === 'string' && redirectTo ? redirectTo : '/dashboard'
+
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    const needsMfa = aal && aal.nextLevel === 'aal2' && aal.currentLevel !== 'aal2'
+    redirectTarget = needsMfa ? `/verify-2fa?redirectTo=${encodeURIComponent(afterLogin)}` : afterLogin
   } catch {
     return { error: CONNECTION_ERROR }
   }
   redirect(redirectTarget)
+}
+
+const verifyTwoFactorSchema = z.object({
+  code: z.string().trim().length(6, { message: '6 haneli kodu girin.' }),
+})
+
+export async function verifyTwoFactorCode(_state: ActionState, formData: FormData): Promise<ActionState> {
+  const parsed = verifyTwoFactorSchema.safeParse({ code: formData.get('code') })
+  if (!parsed.success) return { error: parsed.error.issues[0].message }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user?.email) return { error: 'Oturum bulunamadı.' }
+
+  const { limited, windowMinutes } = await isRateLimited(user.email, 'login')
+  if (limited) {
+    return { error: `Çok fazla başarısız deneme. Lütfen ${windowMinutes} dakika sonra tekrar dene.` }
+  }
+
+  const { data: factorsData } = await supabase.auth.mfa.listFactors()
+  const factor = factorsData?.totp.find((f) => f.status === 'verified')
+  if (!factor) return { error: 'İki adımlı doğrulama etkin değil.' }
+
+  const { error } = await supabase.auth.mfa.challengeAndVerify({
+    factorId: factor.id,
+    code: parsed.data.code,
+  })
+  await recordAuthAttempt(user.email, 'login', !error)
+  if (error) return { error: 'Kod hatalı ya da süresi dolmuş.' }
+
+  const redirectTo = formData.get('redirectTo')
+  redirect(typeof redirectTo === 'string' && redirectTo ? redirectTo : '/dashboard')
 }
 
 const forgotPasswordSchema = z.object({

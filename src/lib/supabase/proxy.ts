@@ -41,6 +41,7 @@ export async function updateSession(request: NextRequest) {
   // — a fetch() following a 307 to /login would try to JSON.parse the login
   // page's HTML.
   const isApiRoute = pathname.startsWith('/api/')
+  const isMfaRoute = pathname.startsWith('/verify-2fa')
 
   if (!user && !isPublicRoute && !isApiRoute) {
     const url = request.nextUrl.clone()
@@ -53,6 +54,32 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
+  }
+
+  // A signed-in user whose session hasn't cleared the MFA challenge yet
+  // (currentLevel behind nextLevel) must be routed to /verify-2fa before
+  // reaching any protected page — otherwise a valid aal1 session alone would
+  // be enough to bypass the enrolled second factor.
+  if (user && !isApiRoute) {
+    let needsMfa = false
+    try {
+      const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+      needsMfa = !!aal && aal.nextLevel === 'aal2' && aal.currentLevel !== 'aal2'
+    } catch {
+      // fail open — an MFA-status check failure shouldn't lock everyone out
+    }
+
+    if (needsMfa && !isMfaRoute) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/verify-2fa'
+      url.searchParams.set('redirectTo', pathname)
+      return NextResponse.redirect(url)
+    }
+    if (!needsMfa && isMfaRoute) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard'
+      return NextResponse.redirect(url)
+    }
   }
 
   return response
