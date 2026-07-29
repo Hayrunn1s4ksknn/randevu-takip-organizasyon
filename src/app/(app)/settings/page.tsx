@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { getCurrentUserAndProfile } from '@/services/profile'
 import { DarkModeToggle } from '@/features/settings/dark-mode-toggle'
 import { EditNameForm } from '@/features/settings/edit-name-form'
+import { ChangePasswordForm } from '@/features/settings/change-password-form'
 
 export default async function SettingsPage() {
   const { user, profile } = await getCurrentUserAndProfile()
@@ -40,9 +41,14 @@ export default async function SettingsPage() {
       </section>
 
       <section className="rounded-2xl border border-border bg-surface-solid p-[22px]">
+        <div className="mb-4 text-[14.5px] font-bold">Şifre Değiştir</div>
+        <ChangePasswordForm />
+      </section>
+
+      <section className="rounded-2xl border border-border bg-surface-solid p-[22px]">
         <div className="mb-1 text-[14.5px] font-bold">Bildirimler ve Güvenlik</div>
         <p className="text-[13px] text-text-secondary">
-          E-posta/SMS/Push bildirim tercihleri, 2FA ve şifre değiştirme Faz 2&apos;de bu sayfaya eklenecek.
+          E-posta/SMS/Push bildirim tercihleri ve 2FA Faz 2&apos;de bu sayfaya eklenecek.
         </p>
       </section>
 
