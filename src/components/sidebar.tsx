@@ -2,17 +2,27 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import {
+  LayoutDashboard,
+  CalendarCheck,
+  ListChecks,
+  Users,
+  Building2,
+  Calendar,
+  BarChart3,
+  Settings,
+} from 'lucide-react'
 import { useUiStore } from '@/store/ui'
 
 const NAV_ITEMS = [
-  { key: 'dashboard', href: '/dashboard', label: 'Dashboard' },
-  { key: 'appointments', href: '/appointments', label: 'Randevular' },
-  { key: 'tasks', href: '/tasks', label: 'Görevler' },
-  { key: 'contacts', href: '/contacts', label: 'Kişiler' },
-  { key: 'orgs', href: '/organizations', label: 'Kurumlar' },
-  { key: 'calendar', href: '/calendar', label: 'Takvim' },
-  { key: 'reports', href: '/reports', label: 'Raporlar' },
-  { key: 'settings', href: '/settings', label: 'Ayarlar' },
+  { key: 'dashboard', href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { key: 'appointments', href: '/appointments', label: 'Randevular', icon: CalendarCheck },
+  { key: 'tasks', href: '/tasks', label: 'Görevler', icon: ListChecks },
+  { key: 'contacts', href: '/contacts', label: 'Kişiler', icon: Users },
+  { key: 'orgs', href: '/organizations', label: 'Kurumlar', icon: Building2 },
+  { key: 'calendar', href: '/calendar', label: 'Takvim', icon: Calendar },
+  { key: 'reports', href: '/reports', label: 'Raporlar', icon: BarChart3 },
+  { key: 'settings', href: '/settings', label: 'Ayarlar', icon: Settings },
 ] as const
 
 export function Sidebar({ fullName, roleLabel }: { fullName: string; roleLabel: string }) {
@@ -34,7 +44,7 @@ export function Sidebar({ fullName, roleLabel }: { fullName: string; roleLabel: 
       >
         <div className="flex items-center gap-2.5 px-2.5 pb-[22px] pt-2">
           <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] bg-white/15 text-[15px] font-bold text-white">
-            RP
+            TR
           </div>
           <div>
             <div className="text-[10px] font-semibold tracking-[1.2px] text-white/50">MERSİN TEKNOPARK</div>
@@ -44,6 +54,7 @@ export function Sidebar({ fullName, roleLabel }: { fullName: string; roleLabel: 
         <nav className="mt-2 flex flex-col gap-0.5">
           {NAV_ITEMS.map((item) => {
             const active = pathname.startsWith(item.href)
+            const Icon = item.icon
             return (
               <Link
                 key={item.key}
@@ -52,9 +63,11 @@ export function Sidebar({ fullName, roleLabel }: { fullName: string; roleLabel: 
                 className="flex min-h-[44px] items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-[13.5px] transition-colors hover:bg-white/[0.08]"
                 style={{ background: active ? 'rgba(255,255,255,0.14)' : 'transparent' }}
               >
-                <span
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ background: active ? '#fff' : 'rgba(255,255,255,0.35)' }}
+                <Icon
+                  size={18}
+                  strokeWidth={2}
+                  className="shrink-0"
+                  style={{ color: active ? '#fff' : 'rgba(255,255,255,0.5)' }}
                 />
                 <span
                   className="font-medium"

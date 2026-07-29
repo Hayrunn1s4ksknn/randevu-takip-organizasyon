@@ -1,6 +1,8 @@
 'use client'
 
 import { useTransition } from 'react'
+import Link from 'next/link'
+import { Menu, House, Settings, Sun, Moon } from 'lucide-react'
 import { useUiStore } from '@/store/ui'
 import { toggleDarkMode } from '@/features/settings/actions'
 import { UserMenu } from '@/components/user-menu'
@@ -26,9 +28,9 @@ export function Topbar({
         <button
           onClick={openMobileNav}
           aria-label="Menü"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] text-lg md:hidden"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] md:hidden"
         >
-          ☰
+          <Menu size={22} />
         </button>
         <div className="hidden shrink-0 text-base font-bold text-text-primary sm:block">{pageTitle}</div>
         <button
@@ -41,14 +43,28 @@ export function Topbar({
           </span>
         </button>
       </div>
-      <div className="ml-2.5 flex shrink-0 items-center gap-2.5 md:gap-3.5">
+      <div className="ml-2.5 flex shrink-0 items-center gap-2 md:gap-2.5">
+        <Link
+          href="/dashboard"
+          title="Ana Sayfa"
+          className="hidden h-11 w-11 items-center justify-center rounded-[9px] border border-border bg-bg text-text-secondary hover:border-accent hover:text-accent sm:flex"
+        >
+          <House size={19} />
+        </Link>
+        <Link
+          href="/settings"
+          title="Ayarlar"
+          className="hidden h-11 w-11 items-center justify-center rounded-[9px] border border-border bg-bg text-text-secondary hover:border-accent hover:text-accent sm:flex"
+        >
+          <Settings size={19} />
+        </Link>
         <button
           onClick={() => startTransition(() => toggleDarkMode(!isDark))}
           disabled={pending}
           title="Tema değiştir"
-          className="flex h-11 w-11 items-center justify-center rounded-[9px] border border-border bg-bg text-[15px] disabled:opacity-60"
+          className="flex h-11 w-11 items-center justify-center rounded-[9px] border border-border bg-bg text-text-secondary disabled:opacity-60"
         >
-          {isDark ? '☀️' : '🌙'}
+          {isDark ? <Sun size={19} /> : <Moon size={19} />}
         </button>
         <UserMenu fullName={fullName} email={email} />
       </div>
