@@ -1,5 +1,5 @@
 export const metadata = {
-  title: 'Gizlilik Politikası — Randevu Paneli',
+  title: 'Gizlilik Politikası — Technoscope Randevu',
 }
 
 export default function PrivacyPage() {

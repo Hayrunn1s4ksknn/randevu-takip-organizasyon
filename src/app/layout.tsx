@@ -11,8 +11,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Randevu Paneli',
-  description: 'Kurumsal Randevu Takip ve Organizasyon Sistemi',
+  title: 'Technoscope Randevu',
+  description: 'Mersin Technoscope Kurumsal Randevu Takip ve Organizasyon Sistemi',
 }
 
 const SYSTEM_THEME_SCRIPT = `

@@ -30,8 +30,7 @@ export function Sidebar({ fullName, roleLabel }: { fullName: string; roleLabel: 
     <>
       {mobileNavOpen && <div onClick={closeMobileNav} className="fixed inset-0 z-40 bg-black/40 md:hidden" />}
       <div
-        className="fixed left-0 top-0 z-50 flex h-full w-[248px] shrink-0 -translate-x-full flex-col bg-sidebar-bg p-3.5 transition-transform duration-200 md:static md:z-auto md:translate-x-0"
-        style={mobileNavOpen ? { transform: 'translateX(0)' } : undefined}
+        className={`fixed left-0 top-0 z-50 flex h-full w-[248px] shrink-0 flex-col bg-sidebar-bg p-3.5 transition-transform duration-200 md:static md:z-auto md:translate-x-0 ${mobileNavOpen ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="flex items-center gap-2.5 px-2.5 pb-[22px] pt-2">
           <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] bg-white/15 text-[15px] font-bold text-white">
@@ -39,7 +38,7 @@ export function Sidebar({ fullName, roleLabel }: { fullName: string; roleLabel: 
           </div>
           <div>
             <div className="text-[10px] font-semibold tracking-[1.2px] text-white/50">MERSİN TEKNOPARK</div>
-            <div className="text-sm font-bold tracking-[0.3px] text-white">RANDEVU PANELİ</div>
+            <div className="text-sm font-bold tracking-[0.3px] text-white">TECHNOSCOPE RANDEVU</div>
           </div>
         </div>
         <nav className="mt-2 flex flex-col gap-0.5">

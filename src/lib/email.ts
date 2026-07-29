@@ -1,7 +1,7 @@
 import 'server-only'
 import { Resend } from 'resend'
 
-const FROM = process.env.EMAIL_FROM ?? 'Randevu Paneli <onboarding@resend.dev>'
+const FROM = process.env.EMAIL_FROM ?? 'Technoscope Randevu <onboarding@resend.dev>'
 
 function getClient() {
   if (!process.env.RESEND_API_KEY) return null
