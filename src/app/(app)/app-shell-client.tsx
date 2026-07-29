@@ -30,6 +30,9 @@ export function AppShellClient({
   email,
   isDark,
   orgOptions,
+  contactOptions,
+  staffOptions,
+  appointmentOptions,
   userId,
 }: {
   children: React.ReactNode
@@ -37,6 +40,9 @@ export function AppShellClient({
   email: string
   isDark: boolean
   orgOptions: { id: number; name: string }[]
+  contactOptions: { id: number; name: string }[]
+  staffOptions: { id: string; name: string }[]
+  appointmentOptions: { id: number; title: string }[]
   userId: string
 }) {
   const pathname = usePathname()
@@ -49,8 +55,13 @@ export function AppShellClient({
       <SearchPalette />
       <ToastContainer />
       <RealtimeNotifier userId={userId} />
-      <QuickActionModals orgOptions={orgOptions} />
-      <AppointmentDrawer />
+      <QuickActionModals
+        orgOptions={orgOptions}
+        contactOptions={contactOptions}
+        staffOptions={staffOptions}
+        appointmentOptions={appointmentOptions}
+      />
+      <AppointmentDrawer contactOptions={contactOptions} staffOptions={staffOptions} />
       <ContactDrawer orgOptions={orgOptions} />
       <OrganizationDrawer />
       <BottomNav />

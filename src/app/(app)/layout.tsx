@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
-import { getCurrentUserAndProfile } from '@/services/profile'
+import { getCurrentUserAndProfile, getStaffOptions } from '@/services/profile'
 import { getOrganizationOptions } from '@/services/organizations'
+import { getContactOptions } from '@/services/contacts'
+import { getAppointmentOptions } from '@/services/appointments'
 import { Sidebar } from '@/components/sidebar'
 import { AppShellClient } from './app-shell-client'
 
@@ -17,7 +19,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const fullName = profile?.full_name ?? user.email ?? 'Kullanıcı'
   const roleLabel = ROLE_LABELS[profile?.role ?? 'personel']
-  const orgOptions = await getOrganizationOptions()
+  const [orgOptions, contactOptions, staffOptions, appointmentOptions] = await Promise.all([
+    getOrganizationOptions(),
+    getContactOptions(),
+    getStaffOptions(),
+    getAppointmentOptions(),
+  ])
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-bg text-text-primary">
@@ -27,6 +34,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         email={user.email ?? ''}
         isDark={profile?.dark_mode ?? false}
         orgOptions={orgOptions}
+        contactOptions={contactOptions}
+        staffOptions={staffOptions}
+        appointmentOptions={appointmentOptions}
         userId={user.id}
       >
         {children}

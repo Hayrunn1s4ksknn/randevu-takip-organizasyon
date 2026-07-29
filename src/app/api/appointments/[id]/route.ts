@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { MeetingType } from '@/types/database'
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -15,7 +16,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
       supabase
         .from('appointments')
         .select(
-          'id, title, date, time, location, status, priority, meeting_type, duration_minutes, organizations(name, email)'
+          'id, title, date, time, location, status, priority, meeting_type, duration_minutes, assigned_to, organizations(name, email), assigned_profile:profiles!appointments_assigned_to_fkey(full_name)'
         )
         .eq('id', appointmentId)
         .single(),
@@ -80,18 +81,36 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
-  const { meeting_type, duration_minutes } = await request.json()
-  if (meeting_type !== null && !MEETING_TYPES.includes(meeting_type)) {
-    return NextResponse.json({ error: 'invalid meeting_type' }, { status: 400 })
+  const body = await request.json()
+  const update: {
+    meeting_type?: MeetingType | null
+    duration_minutes?: number | null
+    assigned_to?: string | null
+  } = {}
+
+  if ('meeting_type' in body) {
+    if (body.meeting_type !== null && !MEETING_TYPES.includes(body.meeting_type)) {
+      return NextResponse.json({ error: 'invalid meeting_type' }, { status: 400 })
+    }
+    update.meeting_type = body.meeting_type
   }
-  if (duration_minutes !== null && (!Number.isFinite(duration_minutes) || duration_minutes <= 0)) {
-    return NextResponse.json({ error: 'invalid duration_minutes' }, { status: 400 })
+  if ('duration_minutes' in body) {
+    if (
+      body.duration_minutes !== null &&
+      (!Number.isFinite(body.duration_minutes) || body.duration_minutes <= 0)
+    ) {
+      return NextResponse.json({ error: 'invalid duration_minutes' }, { status: 400 })
+    }
+    update.duration_minutes = body.duration_minutes
+  }
+  if ('assigned_to' in body) {
+    if (body.assigned_to !== null && typeof body.assigned_to !== 'string') {
+      return NextResponse.json({ error: 'invalid assigned_to' }, { status: 400 })
+    }
+    update.assigned_to = body.assigned_to
   }
 
-  const { error } = await supabase
-    .from('appointments')
-    .update({ meeting_type, duration_minutes })
-    .eq('id', appointmentId)
+  const { error } = await supabase.from('appointments').update(update).eq('id', appointmentId)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
   return NextResponse.json({ success: true })

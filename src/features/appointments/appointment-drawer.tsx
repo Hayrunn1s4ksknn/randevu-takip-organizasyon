@@ -29,7 +29,9 @@ type DrawerData = {
     status: AppointmentStatus
     meeting_type: MeetingType | null
     duration_minutes: number | null
+    assigned_to: string | null
     organizations: { name: string; email: string | null } | null
+    assigned_profile: { full_name: string | null } | null
   }
   participants: { id: number; name: string }[]
   notes: { id: number; body: string; created_at: string; profiles: { full_name: string | null } | null }[]
@@ -360,7 +362,137 @@ function MeetingDetailsEditor({
   )
 }
 
-export function AppointmentDrawer() {
+function AssignedToEditor({
+  appointmentId,
+  assignedTo,
+  staffOptions,
+  onChanged,
+}: {
+  appointmentId: number
+  assignedTo: string | null
+  staffOptions: { id: string; name: string }[]
+  onChanged: () => void
+}) {
+  const [value, setValue] = useState(assignedTo ?? '')
+  const [pending, setPending] = useState(false)
+
+  async function handleChange(next: string) {
+    setValue(next)
+    setPending(true)
+    await fetch(`/api/appointments/${appointmentId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ assigned_to: next || null }),
+    })
+    setPending(false)
+    onChanged()
+  }
+
+  return (
+    <select
+      value={value}
+      disabled={pending}
+      onChange={(e) => handleChange(e.target.value)}
+      className="mt-2 rounded-[7px] border border-border bg-bg px-2 py-1 text-[11.5px] disabled:opacity-50"
+    >
+      <option value="">Sorumlu atanmadı</option>
+      {staffOptions.map((s) => (
+        <option key={s.id} value={s.id}>
+          {s.name}
+        </option>
+      ))}
+    </select>
+  )
+}
+
+function ParticipantsTab({
+  appointmentId,
+  participants,
+  contactOptions,
+  onChanged,
+}: {
+  appointmentId: number
+  participants: DrawerData['participants']
+  contactOptions: { id: number; name: string }[]
+  onChanged: () => void
+}) {
+  const [selected, setSelected] = useState('')
+  const [pending, setPending] = useState(false)
+
+  const available = contactOptions.filter((c) => !participants.some((p) => p.id === c.id))
+
+  async function handleAdd() {
+    if (!selected) return
+    setPending(true)
+    await fetch(`/api/appointments/${appointmentId}/participants`, {
+      method: 'POST',
+      body: JSON.stringify({ contact_id: Number(selected) }),
+    })
+    setSelected('')
+    setPending(false)
+    onChanged()
+  }
+
+  async function handleRemove(contactId: number) {
+    await fetch(`/api/appointments/${appointmentId}/participants/${contactId}`, { method: 'DELETE' })
+    onChanged()
+  }
+
+  return (
+    <div>
+      <div className="mb-4 flex gap-2">
+        <select
+          value={selected}
+          onChange={(e) => setSelected(e.target.value)}
+          className="flex-1 rounded-[9px] border border-border bg-bg px-3 py-2 text-[13px] text-text-primary outline-none focus:border-accent"
+        >
+          <option value="">Kişi seçin</option>
+          {available.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={handleAdd}
+          disabled={pending || !selected}
+          className="rounded-[9px] bg-primary px-3.5 py-2 text-[12.5px] font-bold text-white disabled:opacity-50"
+        >
+          Ekle
+        </button>
+      </div>
+
+      {participants.length === 0 && <p className="text-[13px] text-text-secondary">Katılımcı eklenmemiş.</p>}
+      <div className="flex flex-col gap-2.5">
+        {participants.map((p) => (
+          <div key={p.id} className="flex items-center gap-2.5 text-[13px]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-white">
+              {p.name
+                .split(' ')
+                .map((w) => w[0])
+                .join('')
+                .slice(0, 2)}
+            </div>
+            <span className="flex-1">{p.name}</span>
+            <button
+              onClick={() => handleRemove(p.id)}
+              className="shrink-0 rounded-[7px] border border-danger px-2 py-1 text-[11px] font-bold text-danger"
+            >
+              Kaldır
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export function AppointmentDrawer({
+  contactOptions,
+  staffOptions,
+}: {
+  contactOptions: { id: number; name: string }[]
+  staffOptions: { id: string; name: string }[]
+}) {
   const drawerApptId = useUiStore((s) => s.drawerApptId)
   const closeDrawer = useUiStore((s) => s.closeDrawer)
   const [tab, setTab] = useState<TabKey>('notlar')
@@ -415,6 +547,17 @@ export function AppointmentDrawer() {
                 durationMinutes={a.duration_minutes}
                 onChanged={invalidate}
               />
+            )}
+            {a && drawerApptId !== null && (
+              <div className="mt-1.5 flex items-center gap-2 text-[11.5px] text-text-secondary">
+                <span>Sorumlu:</span>
+                <AssignedToEditor
+                  appointmentId={drawerApptId}
+                  assignedTo={a.assigned_to}
+                  staffOptions={staffOptions}
+                  onChanged={invalidate}
+                />
+              </div>
             )}
           </div>
           <button
@@ -499,24 +642,13 @@ export function AppointmentDrawer() {
             </div>
           )}
 
-          {data && tab === 'katilimcilar' && (
-            <div className="flex flex-col gap-2.5">
-              {data.participants.length === 0 && (
-                <p className="text-[13px] text-text-secondary">Katılımcı eklenmemiş.</p>
-              )}
-              {data.participants.map((p) => (
-                <div key={p.id} className="flex items-center gap-2.5 text-[13px]">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-[11px] font-bold text-white">
-                    {p.name
-                      .split(' ')
-                      .map((w) => w[0])
-                      .join('')
-                      .slice(0, 2)}
-                  </div>
-                  {p.name}
-                </div>
-              ))}
-            </div>
+          {data && tab === 'katilimcilar' && drawerApptId !== null && (
+            <ParticipantsTab
+              appointmentId={drawerApptId}
+              participants={data.participants}
+              contactOptions={contactOptions}
+              onChanged={invalidate}
+            />
           )}
 
           {data && tab === 'timeline' && (

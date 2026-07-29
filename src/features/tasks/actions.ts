@@ -9,19 +9,25 @@ export type ActionState = { error?: string; success?: boolean } | undefined
 
 const schema = z.object({
   title: z.string().trim().min(1, { message: 'Görev başlığı zorunlu.' }),
+  description: z.string().trim().optional(),
   deadline: z.string().trim().optional(),
   priority: z.enum(['Düşük', 'Orta', 'Yüksek']),
+  appointment_id: z.string().trim().optional(),
+  assigned_to: z.string().trim().optional(),
 })
 
 export async function createTask(_state: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = schema.safeParse({
     title: formData.get('title'),
+    description: formData.get('description'),
     deadline: formData.get('deadline'),
     priority: formData.get('priority'),
+    appointment_id: formData.get('appointment_id'),
+    assigned_to: formData.get('assigned_to'),
   })
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
-  const { title, deadline, priority } = parsed.data
+  const { title, description, deadline, priority, appointment_id, assigned_to } = parsed.data
   const supabase = await createClient()
   const {
     data: { user },
@@ -29,8 +35,11 @@ export async function createTask(_state: ActionState, formData: FormData): Promi
 
   const { error } = await supabase.from('tasks').insert({
     title,
+    description: description || null,
     deadline: deadline || null,
     priority,
+    appointment_id: appointment_id ? Number(appointment_id) : null,
+    assigned_to: assigned_to || null,
     created_by: user?.id ?? null,
   })
   if (error) return { error: 'Görev oluşturulamadı.' }
@@ -43,16 +52,26 @@ export async function createTask(_state: ActionState, formData: FormData): Promi
 export async function updateTask(id: number, _state: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = schema.safeParse({
     title: formData.get('title'),
+    description: formData.get('description'),
     deadline: formData.get('deadline'),
     priority: formData.get('priority'),
+    appointment_id: formData.get('appointment_id'),
+    assigned_to: formData.get('assigned_to'),
   })
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
-  const { title, deadline, priority } = parsed.data
+  const { title, description, deadline, priority, appointment_id, assigned_to } = parsed.data
   const supabase = await createClient()
   const { error } = await supabase
     .from('tasks')
-    .update({ title, deadline: deadline || null, priority })
+    .update({
+      title,
+      description: description || null,
+      deadline: deadline || null,
+      priority,
+      appointment_id: appointment_id ? Number(appointment_id) : null,
+      assigned_to: assigned_to || null,
+    })
     .eq('id', id)
   if (error) return { error: 'Görev güncellenemedi.' }
 

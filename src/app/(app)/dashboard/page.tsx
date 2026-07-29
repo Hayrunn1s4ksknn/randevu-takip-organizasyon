@@ -49,6 +49,50 @@ export default async function DashboardPage() {
         ))}
       </div>
 
+      {/* Overdue warning */}
+      {(data.overdueAppointments.length > 0 || data.overdueTasks.length > 0) && (
+        <div className="mb-5 rounded-2xl border border-danger/40 bg-danger/10 p-[22px]">
+          <div className="mb-3 text-[14.5px] font-bold text-danger">
+            Gecikmiş Kayıtlar ({data.overdueAppointments.length + data.overdueTasks.length})
+          </div>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {data.overdueAppointments.length > 0 && (
+              <div>
+                <div className="mb-2 text-[12px] font-semibold text-text-secondary">Geciken Randevular</div>
+                <div className="flex flex-col gap-1.5">
+                  {data.overdueAppointments.slice(0, 5).map((a) => (
+                    <div key={a.id} className="flex items-center justify-between text-[13px]">
+                      <span className="truncate">
+                        {a.title}
+                        {a.orgName ? ` · ${a.orgName}` : ''}
+                      </span>
+                      <span className="shrink-0 text-text-secondary">
+                        {new Date(`${a.date}T00:00:00`).toLocaleDateString('tr-TR')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {data.overdueTasks.length > 0 && (
+              <div>
+                <div className="mb-2 text-[12px] font-semibold text-text-secondary">Geciken Görevler</div>
+                <div className="flex flex-col gap-1.5">
+                  {data.overdueTasks.slice(0, 5).map((t) => (
+                    <div key={t.id} className="flex items-center justify-between text-[13px]">
+                      <span className="truncate">{t.title}</span>
+                      <span className="shrink-0 text-text-secondary">
+                        {new Date(`${t.deadline}T00:00:00`).toLocaleDateString('tr-TR')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Widgets */}
       <div className="mb-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {data.widgets.map((w) => (

@@ -4,6 +4,16 @@ import type { Database } from '@/types/database'
 
 export type Profile = Database['public']['Tables']['profiles']['Row']
 
+export async function getStaffOptions() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, full_name')
+    .in('role', ['admin', 'yonetici', 'personel'])
+    .order('full_name')
+  return (data ?? []).map((p) => ({ id: p.id, name: p.full_name ?? 'İsimsiz kullanıcı' }))
+}
+
 export async function getCurrentUserAndProfile() {
   try {
     const supabase = await createClient()

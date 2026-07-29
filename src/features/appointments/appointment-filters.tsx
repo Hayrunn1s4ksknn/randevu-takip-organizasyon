@@ -5,7 +5,15 @@ import { useRouter, useSearchParams } from 'next/navigation'
 
 const STATUS_OPTIONS = ['Planlandı', 'Devam Ediyor', 'Tamamlandı', 'İptal Edildi']
 
-export function AppointmentFilters({ orgOptions }: { orgOptions: { id: number; name: string }[] }) {
+export function AppointmentFilters({
+  orgOptions,
+  contactOptions,
+  staffOptions,
+}: {
+  orgOptions: { id: number; name: string }[]
+  contactOptions: { id: number; name: string }[]
+  staffOptions: { id: string; name: string }[]
+}) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const formRef = useRef<HTMLFormElement>(null)
@@ -14,7 +22,7 @@ export function AppointmentFilters({ orgOptions }: { orgOptions: { id: number; n
     if (!formRef.current) return
     const formData = new FormData(formRef.current)
     const params = new URLSearchParams()
-    ;['q', 'status', 'org'].forEach((key) => {
+    ;['q', 'status', 'org', 'dateFrom', 'dateTo', 'contact', 'assigned'].forEach((key) => {
       const value = formData.get(key)
       if (value) params.set(key, String(value))
     })
@@ -56,6 +64,48 @@ export function AppointmentFilters({ orgOptions }: { orgOptions: { id: number; n
           </option>
         ))}
       </select>
+      <select
+        name="contact"
+        defaultValue={searchParams.get('contact') ?? 'all'}
+        onChange={submit}
+        className="rounded-[10px] border border-border bg-surface-solid px-3 py-2.5 text-[13px]"
+      >
+        <option value="all">Tüm Kişiler</option>
+        {contactOptions.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+      </select>
+      <select
+        name="assigned"
+        defaultValue={searchParams.get('assigned') ?? 'all'}
+        onChange={submit}
+        className="rounded-[10px] border border-border bg-surface-solid px-3 py-2.5 text-[13px]"
+      >
+        <option value="all">Tüm Sorumlular</option>
+        {staffOptions.map((s) => (
+          <option key={s.id} value={s.id}>
+            {s.name}
+          </option>
+        ))}
+      </select>
+      <input
+        type="date"
+        name="dateFrom"
+        defaultValue={searchParams.get('dateFrom') ?? ''}
+        onChange={submit}
+        title="Başlangıç tarihi"
+        className="rounded-[10px] border border-border bg-surface-solid px-3 py-2.5 text-[13px]"
+      />
+      <input
+        type="date"
+        name="dateTo"
+        defaultValue={searchParams.get('dateTo') ?? ''}
+        onChange={submit}
+        title="Bitiş tarihi"
+        className="rounded-[10px] border border-border bg-surface-solid px-3 py-2.5 text-[13px]"
+      />
     </form>
   )
 }

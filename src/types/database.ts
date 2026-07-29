@@ -100,6 +100,7 @@ type Appointments = {
     reminder_sent_at: string | null
     meeting_type: MeetingType | null
     duration_minutes: number | null
+    assigned_to: string | null
   }
   Insert: Partial<Appointments['Row']> & { title: string; date: string }
   Update: Partial<Appointments['Row']>
@@ -114,6 +115,13 @@ type Appointments = {
     {
       foreignKeyName: 'appointments_created_by_fkey'
       columns: ['created_by']
+      isOneToOne: false
+      referencedRelation: 'profiles'
+      referencedColumns: ['id']
+    },
+    {
+      foreignKeyName: 'appointments_assigned_to_fkey'
+      columns: ['assigned_to']
       isOneToOne: false
       referencedRelation: 'profiles'
       referencedColumns: ['id']
@@ -220,9 +228,12 @@ type Tasks = {
   Row: {
     id: number
     title: string
+    description: string | null
     deadline: string | null
     priority: AppointmentPriority
     status: TaskStatus
+    appointment_id: number | null
+    assigned_to: string | null
     created_by: string | null
     created_at: string
   }
@@ -232,6 +243,20 @@ type Tasks = {
     {
       foreignKeyName: 'tasks_created_by_fkey'
       columns: ['created_by']
+      isOneToOne: false
+      referencedRelation: 'profiles'
+      referencedColumns: ['id']
+    },
+    {
+      foreignKeyName: 'tasks_appointment_id_fkey'
+      columns: ['appointment_id']
+      isOneToOne: false
+      referencedRelation: 'appointments'
+      referencedColumns: ['id']
+    },
+    {
+      foreignKeyName: 'tasks_assigned_to_fkey'
+      columns: ['assigned_to']
       isOneToOne: false
       referencedRelation: 'profiles'
       referencedColumns: ['id']

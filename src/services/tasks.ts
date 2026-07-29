@@ -2,7 +2,8 @@ import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import type { TaskStatus } from '@/types/database'
 
-const SELECT = 'id, title, deadline, priority, status, created_at'
+const SELECT =
+  'id, title, description, deadline, priority, status, appointment_id, assigned_to, created_at, appointments(title), assigned_profile:profiles!tasks_assigned_to_fkey(full_name)'
 
 export async function getTasksList(filter: TaskStatus | 'all' = 'all') {
   const supabase = await createClient()

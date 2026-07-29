@@ -17,6 +17,7 @@ const schema = z.object({
   priority: z.enum(['Düşük', 'Orta', 'Yüksek']),
   meeting_type: z.enum(['Online', 'Fiziksel', 'Telefon']).optional(),
   duration_minutes: z.string().trim().optional(),
+  assigned_to: z.string().trim().optional(),
 })
 
 export async function createAppointment(_state: ActionState, formData: FormData): Promise<ActionState> {
@@ -29,10 +30,13 @@ export async function createAppointment(_state: ActionState, formData: FormData)
     priority: formData.get('priority'),
     meeting_type: formData.get('meeting_type') || undefined,
     duration_minutes: formData.get('duration_minutes'),
+    assigned_to: formData.get('assigned_to'),
   })
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
-  const { title, org_id, date, time, location, priority, meeting_type, duration_minutes } = parsed.data
+  const { title, org_id, date, time, location, priority, meeting_type, duration_minutes, assigned_to } =
+    parsed.data
+  const contactIds = formData.getAll('contact_ids').map(Number).filter(Number.isFinite)
   const supabase = await createClient()
   const {
     data: { user },
@@ -49,11 +53,18 @@ export async function createAppointment(_state: ActionState, formData: FormData)
       priority,
       meeting_type: meeting_type || null,
       duration_minutes: duration_minutes ? Number(duration_minutes) : null,
+      assigned_to: assigned_to || null,
       created_by: user?.id ?? null,
     })
     .select('id, org_id')
     .single()
   if (error || !created) return { error: 'Randevu oluşturulamadı.' }
+
+  if (contactIds.length > 0) {
+    await supabase
+      .from('appointment_participants')
+      .insert(contactIds.map((contact_id) => ({ appointment_id: created.id, contact_id })))
+  }
 
   revalidatePath('/dashboard')
   revalidatePath('/appointments')

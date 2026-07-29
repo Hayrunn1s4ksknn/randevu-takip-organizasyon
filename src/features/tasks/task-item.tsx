@@ -12,12 +12,25 @@ import type { AppointmentPriority, TaskStatus } from '@/types/database'
 type Task = {
   id: number
   title: string
+  description: string | null
   deadline: string | null
   priority: AppointmentPriority
   status: TaskStatus
+  appointment_id: number | null
+  assigned_to: string | null
+  appointments: { title: string } | null
+  assigned_profile: { full_name: string | null } | null
 }
 
-export function TaskItem({ task }: { task: Task }) {
+export function TaskItem({
+  task,
+  appointmentOptions,
+  staffOptions,
+}: {
+  task: Task
+  appointmentOptions: { id: number; title: string }[]
+  staffOptions: { id: string; name: string }[]
+}) {
   const [pending, startTransition] = useTransition()
   const router = useRouter()
   const activeModal = useUiStore((s) => s.activeModal)
@@ -28,6 +41,7 @@ export function TaskItem({ task }: { task: Task }) {
 
   const prioStyle = PRIORITY_STYLE[task.priority]
   const done = task.status === 'done'
+  const overdue = !done && !!task.deadline && task.deadline < new Date().toISOString().slice(0, 10)
 
   function toggleStatus() {
     startTransition(async () => {
@@ -47,7 +61,10 @@ export function TaskItem({ task }: { task: Task }) {
 
   return (
     <>
-      <div className="flex items-center gap-3 rounded-2xl border border-border bg-surface-solid p-4">
+      <div
+        className="flex items-center gap-3 rounded-2xl border border-border bg-surface-solid p-4"
+        style={overdue ? { borderLeft: '3px solid var(--color-danger)' } : undefined}
+      >
         <input
           type="checkbox"
           checked={done}
@@ -62,12 +79,24 @@ export function TaskItem({ task }: { task: Task }) {
           >
             {task.title}
           </div>
+          {task.description && (
+            <div className="mt-0.5 overflow-hidden text-ellipsis whitespace-nowrap text-[12px] text-text-secondary">
+              {task.description}
+            </div>
+          )}
           <div className="text-[12.5px] text-text-secondary">
             {task.deadline
               ? new Date(`${task.deadline}T00:00:00`).toLocaleDateString('tr-TR')
               : 'Son tarih yok'}
+            {task.assigned_profile?.full_name ? ` · ${task.assigned_profile.full_name}` : ''}
+            {task.appointments?.title ? ` · ${task.appointments.title}` : ''}
           </div>
         </div>
+        {overdue && (
+          <span className="shrink-0 rounded-md bg-danger/15 px-2 py-0.5 text-[10.5px] font-bold text-danger">
+            Gecikti
+          </span>
+        )}
         <span
           className="shrink-0 rounded-md px-2 py-0.5 text-[10.5px] font-bold"
           style={{ background: prioStyle.bg, color: prioStyle.color }}
@@ -94,7 +123,7 @@ export function TaskItem({ task }: { task: Task }) {
         onClose={closeModal}
         title="Görevi Düzenle"
       >
-        <EditTaskForm task={task} />
+        <EditTaskForm task={task} appointmentOptions={appointmentOptions} staffOptions={staffOptions} />
       </Modal>
     </>
   )

@@ -5,7 +5,15 @@ import { createAppointment } from './actions'
 import { modalInputClass, ModalActions } from '@/components/modal'
 import { useUiStore } from '@/store/ui'
 
-export function CreateAppointmentForm({ orgOptions }: { orgOptions: { id: number; name: string }[] }) {
+export function CreateAppointmentForm({
+  orgOptions,
+  contactOptions,
+  staffOptions,
+}: {
+  orgOptions: { id: number; name: string }[]
+  contactOptions: { id: number; name: string }[]
+  staffOptions: { id: string; name: string }[]
+}) {
   const [state, action, pending] = useActionState(createAppointment, undefined)
   const closeModal = useUiStore((s) => s.closeModal)
   const showToast = useUiStore((s) => s.showToast)
@@ -38,6 +46,26 @@ export function CreateAppointmentForm({ orgOptions }: { orgOptions: { id: number
         <option value="Orta">Orta Öncelik</option>
         <option value="Yüksek">Yüksek Öncelik</option>
       </select>
+      <select name="assigned_to" defaultValue="" className={modalInputClass}>
+        <option value="">Sorumlu seçin (opsiyonel)</option>
+        {staffOptions.map((s) => (
+          <option key={s.id} value={s.id}>
+            {s.name}
+          </option>
+        ))}
+      </select>
+      <div>
+        <label className="mb-1 block text-[12px] font-semibold text-text-secondary">
+          Katılımcılar (opsiyonel)
+        </label>
+        <select multiple name="contact_ids" className={`${modalInputClass} h-[92px]`}>
+          {contactOptions.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="flex gap-2.5">
         <select name="meeting_type" defaultValue="" className={`${modalInputClass} flex-1`}>
           <option value="">Toplantı tipi</option>

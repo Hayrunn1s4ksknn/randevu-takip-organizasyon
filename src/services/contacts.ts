@@ -11,3 +11,9 @@ export async function getContactsList(search?: string) {
   const { data } = await query.order('name', { ascending: true })
   return data ?? []
 }
+
+export async function getContactOptions() {
+  const supabase = await createClient()
+  const { data } = await supabase.from('contacts').select('id, name').order('name')
+  return data ?? []
+}

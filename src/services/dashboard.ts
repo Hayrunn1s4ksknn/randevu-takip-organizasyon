@@ -31,7 +31,7 @@ export async function getDashboardData() {
       .gte('date', yearStart)
       .lte('date', yearEnd),
     supabase.from('organizations').select('id, name').is('deleted_at', null),
-    supabase.from('tasks').select('id, status'),
+    supabase.from('tasks').select('id, title, deadline, status'),
     supabase
       .from('activities')
       .select('id, description, created_at, profiles(full_name)')
@@ -125,6 +125,20 @@ export async function getDashboardData() {
   const pendingTasks = tasks.filter((t) => t.status === 'todo').length
   const doneTasks = tasks.filter((t) => t.status === 'done').length
 
+  const overdueAppointments = appointments
+    .filter((a) => a.date < todayISO && a.status !== 'Tamamlandı' && a.status !== 'İptal Edildi')
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((a) => ({
+      id: a.id,
+      title: a.title,
+      date: a.date,
+      orgName: (a.organizations as unknown as { name: string } | null)?.name ?? null,
+    }))
+  const overdueTasks = tasks
+    .filter((t) => !!t.deadline && t.deadline < todayISO && t.status !== 'done')
+    .sort((a, b) => (a.deadline as string).localeCompare(b.deadline as string))
+    .map((t) => ({ id: t.id, title: t.title, deadline: t.deadline as string }))
+
   const heroStats = [
     {
       label: 'Toplam Toplantı',
@@ -190,5 +204,7 @@ export async function getDashboardData() {
     orgDistribution,
     heatmap,
     activityFeed,
+    overdueAppointments,
+    overdueTasks,
   }
 }

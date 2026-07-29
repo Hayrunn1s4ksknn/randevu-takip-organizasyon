@@ -17,12 +17,18 @@ type Row = {
   status: AppointmentStatus
   priority: AppointmentPriority
   organizations: { name: string } | null
+  assigned_profile: { full_name: string | null } | null
+}
+
+function isOverdue(row: Row, todayISO: string) {
+  return row.date < todayISO && row.status !== 'Tamamlandı' && row.status !== 'İptal Edildi'
 }
 
 export function AppointmentsTable({ rows }: { rows: Row[] }) {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const openDrawer = useUiStore((s) => s.openDrawer)
   const showToast = useUiStore((s) => s.showToast)
+  const todayISO = new Date().toISOString().slice(0, 10)
   const [pending, startTransition] = useTransition()
   const router = useRouter()
 
@@ -101,6 +107,7 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
           {rows.map((r) => {
             const statusStyle = STATUS_STYLE[r.status]
             const prioStyle = PRIORITY_STYLE[r.priority]
+            const overdue = isOverdue(r, todayISO)
             return (
               <div
                 key={r.id}
@@ -109,6 +116,7 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
                 onClick={() => openDrawer(r.id)}
                 onKeyDown={onActivateKey(() => openDrawer(r.id))}
                 className="grid cursor-pointer grid-cols-[36px_1.6fr_1fr_0.8fr_1fr_1fr_0.9fr] items-center gap-2.5 border-b border-border px-5 py-3.5 text-[13px] last:border-b-0 hover:bg-bg"
+                style={overdue ? { borderLeft: '3px solid var(--color-danger)' } : undefined}
               >
                 <input
                   type="checkbox"
@@ -118,7 +126,10 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
                 />
                 <div className="overflow-hidden text-ellipsis whitespace-nowrap font-semibold">{r.title}</div>
                 <div className="overflow-hidden text-ellipsis whitespace-nowrap text-text-secondary">
-                  {r.organizations?.name ?? '-'}
+                  <div>{r.organizations?.name ?? '-'}</div>
+                  {r.assigned_profile?.full_name && (
+                    <div className="text-[11px]">{r.assigned_profile.full_name}</div>
+                  )}
                 </div>
                 <div className="text-text-secondary">
                   {new Date(`${r.date}T00:00:00`).toLocaleDateString('tr-TR')}
@@ -132,7 +143,12 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
                     {r.priority}
                   </span>
                 </div>
-                <div>
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {overdue && (
+                    <span className="rounded-[7px] bg-danger/15 px-2 py-1 text-[10.5px] font-bold text-danger">
+                      Gecikti
+                    </span>
+                  )}
                   <span
                     className="rounded-[7px] px-2.5 py-1 text-[11.5px] font-bold"
                     style={{ background: statusStyle.bg, color: statusStyle.color }}
@@ -152,6 +168,7 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
           {rows.map((r) => {
             const statusStyle = STATUS_STYLE[r.status]
             const prioStyle = PRIORITY_STYLE[r.priority]
+            const overdue = isOverdue(r, todayISO)
             return (
               <div
                 key={r.id}
@@ -160,6 +177,7 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
                 onClick={() => openDrawer(r.id)}
                 onKeyDown={onActivateKey(() => openDrawer(r.id))}
                 className="cursor-pointer rounded-2xl border border-border bg-surface-solid p-4"
+                style={overdue ? { borderLeft: '3px solid var(--color-danger)' } : undefined}
               >
                 <div className="flex items-start gap-3">
                   <input
@@ -181,8 +199,9 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
                     </div>
                     <div className="mt-1 truncate text-xs text-text-secondary">
                       {r.organizations?.name ?? '-'}
+                      {r.assigned_profile?.full_name ? ` · ${r.assigned_profile.full_name}` : ''}
                     </div>
-                    <div className="mt-1.5 flex items-center gap-2 text-xs text-text-secondary">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-text-secondary">
                       <span>{new Date(`${r.date}T00:00:00`).toLocaleDateString('tr-TR')}</span>
                       <span>{r.time?.slice(0, 5) ?? '-'}</span>
                       <span
@@ -191,6 +210,11 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
                       >
                         {r.priority}
                       </span>
+                      {overdue && (
+                        <span className="rounded-[6px] bg-danger/15 px-1.5 py-0.5 text-[10px] font-bold text-danger">
+                          Gecikti
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
