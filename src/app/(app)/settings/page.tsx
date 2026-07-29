@@ -51,13 +51,6 @@ export default async function SettingsPage() {
         <TwoFactorSection />
       </section>
 
-      <section className="rounded-2xl border border-border bg-surface-solid p-[22px]">
-        <div className="mb-1 text-[14.5px] font-bold">Bildirimler</div>
-        <p className="text-[13px] text-text-secondary">
-          E-posta/SMS/Push bildirim tercihleri Faz 2&apos;de bu sayfaya eklenecek.
-        </p>
-      </section>
-
       {profile?.role === 'admin' && (
         <section className="rounded-2xl border border-border bg-surface-solid p-[22px]">
           <div className="mb-1 text-[14.5px] font-bold">Kullanıcı Yönetimi</div>

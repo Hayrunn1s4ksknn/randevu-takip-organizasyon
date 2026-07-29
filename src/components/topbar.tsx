@@ -46,15 +46,17 @@ export function Topbar({
       <div className="ml-2.5 flex shrink-0 items-center gap-2 md:gap-2.5">
         <Link
           href="/dashboard"
+          aria-label="Ana Sayfa"
           title="Ana Sayfa"
-          className="hidden h-11 w-11 items-center justify-center rounded-[9px] border border-border bg-bg text-text-secondary hover:border-accent hover:text-accent sm:flex"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] border border-border bg-bg text-text-secondary hover:border-accent hover:text-accent"
         >
           <House size={19} />
         </Link>
         <Link
           href="/settings"
+          aria-label="Ayarlar"
           title="Ayarlar"
-          className="hidden h-11 w-11 items-center justify-center rounded-[9px] border border-border bg-bg text-text-secondary hover:border-accent hover:text-accent sm:flex"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] border border-border bg-bg text-text-secondary hover:border-accent hover:text-accent"
         >
           <Settings size={19} />
         </Link>

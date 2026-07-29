@@ -13,7 +13,7 @@ import { BottomNav } from '@/components/bottom-nav'
 import { Fab } from '@/components/fab'
 
 const PAGE_TITLES: Record<string, string> = {
-  '/dashboard': 'Dashboard',
+  '/dashboard': 'Anasayfa',
   '/appointments': 'Randevular',
   '/tasks': 'Görevler',
   '/contacts': 'Kişiler',
