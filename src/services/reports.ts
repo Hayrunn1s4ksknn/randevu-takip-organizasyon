@@ -42,6 +42,44 @@ export async function getTopStaff(limit = 5) {
   return rows.map((r) => ({ ...r, pct: `${Math.round((r.count / max) * 100)}%` }))
 }
 
+export async function getMeetingDurationStats() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('appointments')
+    .select('meeting_type, duration_minutes')
+    .not('meeting_type', 'is', null)
+
+  const rows = data ?? []
+  const byType = new Map<string, { count: number; totalDuration: number; withDuration: number }>()
+  for (const r of rows) {
+    if (!r.meeting_type) continue
+    const entry = byType.get(r.meeting_type) ?? { count: 0, totalDuration: 0, withDuration: 0 }
+    entry.count += 1
+    if (r.duration_minutes != null) {
+      entry.totalDuration += r.duration_minutes
+      entry.withDuration += 1
+    }
+    byType.set(r.meeting_type, entry)
+  }
+
+  const totalCount = rows.length
+  const distribution = [...byType.entries()]
+    .map(([type, e]) => ({
+      type,
+      count: e.count,
+      pct: totalCount ? Math.round((e.count / totalCount) * 100) : 0,
+      avgDuration: e.withDuration ? Math.round(e.totalDuration / e.withDuration) : null,
+    }))
+    .sort((a, b) => b.count - a.count)
+
+  const withDuration = rows.filter((r) => r.duration_minutes != null)
+  const overallAvg = withDuration.length
+    ? Math.round(withDuration.reduce((sum, r) => sum + (r.duration_minutes ?? 0), 0) / withDuration.length)
+    : null
+
+  return { hasData: totalCount > 0, distribution, overallAvg, totalCount }
+}
+
 export async function getYearlyPerformance() {
   const supabase = await createClient()
   const { data } = await supabase.from('appointments').select('date')

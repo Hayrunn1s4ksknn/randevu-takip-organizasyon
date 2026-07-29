@@ -15,6 +15,8 @@ const schema = z.object({
   time: z.string().trim().optional(),
   location: z.string().trim().optional(),
   priority: z.enum(['Düşük', 'Orta', 'Yüksek']),
+  meeting_type: z.enum(['Online', 'Fiziksel', 'Telefon']).optional(),
+  duration_minutes: z.string().trim().optional(),
 })
 
 export async function createAppointment(_state: ActionState, formData: FormData): Promise<ActionState> {
@@ -25,10 +27,12 @@ export async function createAppointment(_state: ActionState, formData: FormData)
     time: formData.get('time'),
     location: formData.get('location'),
     priority: formData.get('priority'),
+    meeting_type: formData.get('meeting_type') || undefined,
+    duration_minutes: formData.get('duration_minutes'),
   })
   if (!parsed.success) return { error: parsed.error.issues[0].message }
 
-  const { title, org_id, date, time, location, priority } = parsed.data
+  const { title, org_id, date, time, location, priority, meeting_type, duration_minutes } = parsed.data
   const supabase = await createClient()
   const {
     data: { user },
@@ -43,6 +47,8 @@ export async function createAppointment(_state: ActionState, formData: FormData)
       time: time || null,
       location: location || null,
       priority,
+      meeting_type: meeting_type || null,
+      duration_minutes: duration_minutes ? Number(duration_minutes) : null,
       created_by: user?.id ?? null,
     })
     .select('id, org_id')

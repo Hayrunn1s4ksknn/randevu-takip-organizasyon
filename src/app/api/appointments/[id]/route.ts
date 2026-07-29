@@ -14,7 +14,9 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     await Promise.all([
       supabase
         .from('appointments')
-        .select('id, title, date, time, location, status, priority, organizations(name, email)')
+        .select(
+          'id, title, date, time, location, status, priority, meeting_type, duration_minutes, organizations(name, email)'
+        )
         .eq('id', appointmentId)
         .single(),
       supabase
@@ -61,4 +63,36 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     files: filesRes.data ?? [],
     emails: emailsRes.data ?? [],
   })
+}
+
+const MEETING_TYPES = ['Online', 'Fiziksel', 'Telefon']
+
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const appointmentId = Number(id)
+  if (!Number.isFinite(appointmentId)) {
+    return NextResponse.json({ error: 'invalid id' }, { status: 400 })
+  }
+
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+
+  const { meeting_type, duration_minutes } = await request.json()
+  if (meeting_type !== null && !MEETING_TYPES.includes(meeting_type)) {
+    return NextResponse.json({ error: 'invalid meeting_type' }, { status: 400 })
+  }
+  if (duration_minutes !== null && (!Number.isFinite(duration_minutes) || duration_minutes <= 0)) {
+    return NextResponse.json({ error: 'invalid duration_minutes' }, { status: 400 })
+  }
+
+  const { error } = await supabase
+    .from('appointments')
+    .update({ meeting_type, duration_minutes })
+    .eq('id', appointmentId)
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+
+  return NextResponse.json({ success: true })
 }

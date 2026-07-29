@@ -6,6 +6,7 @@ export type UserRole = 'admin' | 'yonetici' | 'personel' | 'misafir'
 export type AppointmentStatus = 'Planlandı' | 'Devam Ediyor' | 'Tamamlandı' | 'İptal Edildi'
 export type AppointmentPriority = 'Düşük' | 'Orta' | 'Yüksek'
 export type TaskStatus = 'todo' | 'done'
+export type MeetingType = 'Online' | 'Fiziksel' | 'Telefon'
 
 type Profiles = {
   Row: {
@@ -97,6 +98,8 @@ type Appointments = {
     created_at: string
     updated_at: string
     reminder_sent_at: string | null
+    meeting_type: MeetingType | null
+    duration_minutes: number | null
   }
   Insert: Partial<Appointments['Row']> & { title: string; date: string }
   Update: Partial<Appointments['Row']>

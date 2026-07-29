@@ -5,7 +5,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useUiStore } from '@/store/ui'
 import { useSwipeToClose } from '@/hooks/use-swipe-to-close'
 import { STATUS_STYLE } from '@/lib/status-styles'
-import type { AppointmentStatus } from '@/types/database'
+import type { AppointmentStatus, MeetingType } from '@/types/database'
 
 const TABS = [
   { key: 'notlar', label: 'Notlar' },
@@ -27,6 +27,8 @@ type DrawerData = {
     time: string | null
     location: string | null
     status: AppointmentStatus
+    meeting_type: MeetingType | null
+    duration_minutes: number | null
     organizations: { name: string; email: string | null } | null
   }
   participants: { id: number; name: string }[]
@@ -299,6 +301,65 @@ function ReminderTab({
   )
 }
 
+function MeetingDetailsEditor({
+  appointmentId,
+  meetingType,
+  durationMinutes,
+  onChanged,
+}: {
+  appointmentId: number
+  meetingType: MeetingType | null
+  durationMinutes: number | null
+  onChanged: () => void
+}) {
+  const [type, setType] = useState(meetingType ?? '')
+  const [duration, setDuration] = useState(durationMinutes?.toString() ?? '')
+  const [pending, setPending] = useState(false)
+
+  async function handleSave() {
+    setPending(true)
+    await fetch(`/api/appointments/${appointmentId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        meeting_type: type || null,
+        duration_minutes: duration ? Number(duration) : null,
+      }),
+    })
+    setPending(false)
+    onChanged()
+  }
+
+  return (
+    <div className="mt-2.5 flex flex-wrap items-center gap-2">
+      <select
+        value={type}
+        onChange={(e) => setType(e.target.value as MeetingType | '')}
+        className="rounded-[7px] border border-border bg-bg px-2 py-1 text-[11.5px]"
+      >
+        <option value="">Toplantı tipi yok</option>
+        <option value="Online">Online</option>
+        <option value="Fiziksel">Fiziksel</option>
+        <option value="Telefon">Telefon</option>
+      </select>
+      <input
+        type="number"
+        min={1}
+        value={duration}
+        onChange={(e) => setDuration(e.target.value)}
+        placeholder="Süre (dk)"
+        className="w-[90px] rounded-[7px] border border-border bg-bg px-2 py-1 text-[11.5px]"
+      />
+      <button
+        onClick={handleSave}
+        disabled={pending}
+        className="rounded-[7px] border border-accent px-2.5 py-1 text-[11.5px] font-bold text-accent disabled:opacity-50"
+      >
+        Kaydet
+      </button>
+    </div>
+  )
+}
+
 export function AppointmentDrawer() {
   const drawerApptId = useUiStore((s) => s.drawerApptId)
   const closeDrawer = useUiStore((s) => s.closeDrawer)
@@ -346,6 +407,14 @@ export function AppointmentDrawer() {
               >
                 {a.status}
               </span>
+            )}
+            {a && drawerApptId !== null && (
+              <MeetingDetailsEditor
+                appointmentId={drawerApptId}
+                meetingType={a.meeting_type}
+                durationMinutes={a.duration_minutes}
+                onChanged={invalidate}
+              />
             )}
           </div>
           <button

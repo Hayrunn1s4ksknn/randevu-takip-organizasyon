@@ -8,6 +8,10 @@ type Props = {
   topOrgs: { name: string; count: number }[]
   topStaff: { name: string; count: number }[]
   yearly: { label: string; count: number }[]
+  meetingStats: {
+    hasData: boolean
+    distribution: { type: string; count: number; avgDuration: number | null }[]
+  }
 }
 
 function addSection(doc: jsPDF, title: string, head: string[], body: string[][]) {
@@ -20,7 +24,7 @@ function addSection(doc: jsPDF, title: string, head: string[], body: string[][])
   })
 }
 
-export function ExportReportPdfButton({ topOrgs, topStaff, yearly }: Props) {
+export function ExportReportPdfButton({ topOrgs, topStaff, yearly, meetingStats }: Props) {
   function download() {
     const doc = new jsPDF()
 
@@ -57,6 +61,16 @@ export function ExportReportPdfButton({ topOrgs, topStaff, yearly }: Props) {
       ['Yıl', 'Randevu Sayısı'],
       yearly.map((y) => [y.label, String(y.count)])
     )
+
+    if (meetingStats.hasData) {
+      doc.addPage()
+      addSection(
+        doc,
+        'Toplantı Süreleri',
+        ['Toplantı Tipi', 'Randevu Sayısı', 'Ortalama Süre (dk)'],
+        meetingStats.distribution.map((d) => [d.type, String(d.count), d.avgDuration?.toString() ?? '-'])
+      )
+    }
 
     doc.save(`rapor_${new Date().toISOString().slice(0, 10)}.pdf`)
   }

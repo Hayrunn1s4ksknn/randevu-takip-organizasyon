@@ -38,6 +38,21 @@ export function CreateAppointmentForm({ orgOptions }: { orgOptions: { id: number
         <option value="Orta">Orta Öncelik</option>
         <option value="Yüksek">Yüksek Öncelik</option>
       </select>
+      <div className="flex gap-2.5">
+        <select name="meeting_type" defaultValue="" className={`${modalInputClass} flex-1`}>
+          <option value="">Toplantı tipi</option>
+          <option value="Online">Online</option>
+          <option value="Fiziksel">Fiziksel</option>
+          <option value="Telefon">Telefon</option>
+        </select>
+        <input
+          type="number"
+          name="duration_minutes"
+          placeholder="Süre (dk)"
+          min={1}
+          className={`${modalInputClass} flex-1`}
+        />
+      </div>
       {state?.error && <p className="text-[12.5px] font-medium text-danger">{state.error}</p>}
       <ModalActions onCancel={closeModal} submitLabel="Oluştur" pending={pending} />
     </form>
