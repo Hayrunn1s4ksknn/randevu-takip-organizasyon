@@ -49,7 +49,7 @@ export function ExportReportPdfButton({ topOrgs, topStaff, yearly, meetingStats 
     doc.addPage()
     addSection(
       doc,
-      'En Aktif Personel',
+      'En Aktif Sorumlu Personel',
       ['Personel', 'Randevu Sayısı'],
       topStaff.map((s) => [s.name, String(s.count)])
     )

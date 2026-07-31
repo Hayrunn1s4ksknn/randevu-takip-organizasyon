@@ -58,13 +58,17 @@ export function CreateAppointmentForm({
         <label className="mb-1 block text-[12px] font-semibold text-text-secondary">
           Katılımcılar (opsiyonel)
         </label>
-        <select multiple name="contact_ids" className={`${modalInputClass} h-[92px]`}>
+        <div className="flex max-h-[140px] flex-col gap-1.5 overflow-y-auto rounded-[9px] border border-border bg-bg px-3.5 py-2.5">
+          {contactOptions.length === 0 && (
+            <p className="text-[12.5px] text-text-secondary">Henüz kayıtlı kişi yok.</p>
+          )}
           {contactOptions.map((c) => (
-            <option key={c.id} value={c.id}>
+            <label key={c.id} className="flex items-center gap-2 text-[13px] text-text-primary">
+              <input type="checkbox" name="contact_ids" value={c.id} className="h-4 w-4 accent-accent" />
               {c.name}
-            </option>
+            </label>
           ))}
-        </select>
+        </div>
       </div>
       <div className="flex gap-2.5">
         <select name="meeting_type" defaultValue="" className={`${modalInputClass} flex-1`}>

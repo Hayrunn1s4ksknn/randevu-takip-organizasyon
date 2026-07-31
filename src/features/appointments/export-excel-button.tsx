@@ -10,6 +10,7 @@ type ExportRow = {
   status: string
   priority: string
   organizations: { name: string } | null
+  assigned_profile: { full_name: string | null } | null
 }
 
 const columns = [
@@ -24,6 +25,7 @@ const columns = [
   { header: 'Konum', cell: (r: ExportRow) => ({ value: r.location ?? '' }), width: 22 },
   { header: 'Öncelik', cell: (r: ExportRow) => ({ value: r.priority }), width: 12 },
   { header: 'Durum', cell: (r: ExportRow) => ({ value: r.status }), width: 16 },
+  { header: 'Sorumlu', cell: (r: ExportRow) => ({ value: r.assigned_profile?.full_name ?? '' }), width: 20 },
 ]
 
 export function ExportExcelButton({ rows }: { rows: ExportRow[] }) {

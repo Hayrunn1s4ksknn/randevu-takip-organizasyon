@@ -10,11 +10,12 @@ type ExportRow = {
   status: string
   priority: string
   organizations: { name: string } | null
+  assigned_profile: { full_name: string | null } | null
 }
 
 export function ExportCsvButton({ rows }: { rows: ExportRow[] }) {
   function download() {
-    const header = ['Başlık', 'Kurum', 'Tarih', 'Saat', 'Konum', 'Öncelik', 'Durum']
+    const header = ['Başlık', 'Kurum', 'Tarih', 'Saat', 'Konum', 'Öncelik', 'Durum', 'Sorumlu']
     const lines = rows.map((r) =>
       toCsvRow([
         r.title,
@@ -24,6 +25,7 @@ export function ExportCsvButton({ rows }: { rows: ExportRow[] }) {
         r.location ?? '',
         r.priority,
         r.status,
+        r.assigned_profile?.full_name ?? '',
       ])
     )
     const csv = ['﻿' + header.join(','), ...lines].join('\n')

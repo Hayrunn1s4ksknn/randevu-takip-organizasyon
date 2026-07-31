@@ -47,9 +47,11 @@ export default async function ReportsPage() {
         </div>
 
         <div className="rounded-2xl border border-border bg-surface-solid p-[22px]">
-          <div className="mb-4 text-[14.5px] font-bold">En Aktif Personel</div>
+          <div className="mb-4 text-[14.5px] font-bold">En Aktif Sorumlu Personel</div>
           {topStaff.length === 0 ? (
-            <p className="text-[13px] text-text-secondary">Henüz veri yok.</p>
+            <p className="text-[13px] text-text-secondary">
+              Henüz veri yok — randevulara sorumlu kullanıcı atandıkça burada görünecek.
+            </p>
           ) : (
             <div className="flex flex-col gap-3">
               {topStaff.map((s) => (

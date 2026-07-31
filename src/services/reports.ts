@@ -26,15 +26,17 @@ export async function getTopOrganizations(limit = 5) {
 
 export async function getTopStaff(limit = 5) {
   const supabase = await createClient()
-  const { data } = await supabase.from('appointments').select('created_by, profiles(full_name)')
+  const { data } = await supabase
+    .from('appointments')
+    .select('assigned_to, profiles:profiles!appointments_assigned_to_fkey(full_name)')
 
   const counts = new Map<string, { name: string; count: number }>()
   ;(data ?? []).forEach((a) => {
-    if (!a.created_by) return
+    if (!a.assigned_to) return
     const name = (a.profiles as unknown as { full_name: string | null } | null)?.full_name ?? 'Bilinmeyen'
-    const current = counts.get(a.created_by) ?? { name, count: 0 }
+    const current = counts.get(a.assigned_to) ?? { name, count: 0 }
     current.count += 1
-    counts.set(a.created_by, current)
+    counts.set(a.assigned_to, current)
   })
 
   const rows = [...counts.values()].sort((a, b) => b.count - a.count).slice(0, limit)

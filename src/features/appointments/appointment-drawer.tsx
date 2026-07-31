@@ -439,27 +439,35 @@ function ParticipantsTab({
 
   return (
     <div>
-      <div className="mb-4 flex gap-2">
-        <select
-          value={selected}
-          onChange={(e) => setSelected(e.target.value)}
-          className="flex-1 rounded-[9px] border border-border bg-bg px-3 py-2 text-[13px] text-text-primary outline-none focus:border-accent"
-        >
-          <option value="">Kişi seçin</option>
-          {available.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={handleAdd}
-          disabled={pending || !selected}
-          className="rounded-[9px] bg-primary px-3.5 py-2 text-[12.5px] font-bold text-white disabled:opacity-50"
-        >
-          Ekle
-        </button>
-      </div>
+      {available.length > 0 ? (
+        <div className="mb-4 flex gap-2">
+          <select
+            value={selected}
+            onChange={(e) => setSelected(e.target.value)}
+            className="flex-1 rounded-[9px] border border-border bg-bg px-3 py-2 text-[13px] text-text-primary outline-none focus:border-accent"
+          >
+            <option value="">Kişi seçin</option>
+            {available.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={handleAdd}
+            disabled={pending || !selected}
+            className="rounded-[9px] bg-primary px-3.5 py-2 text-[12.5px] font-bold text-white disabled:opacity-50"
+          >
+            Ekle
+          </button>
+        </div>
+      ) : (
+        <p className="mb-4 text-[12.5px] text-text-secondary">
+          {contactOptions.length === 0
+            ? 'Henüz kayıtlı kişi yok.'
+            : 'Kayıtlı tüm kişiler zaten katılımcı olarak eklenmiş.'}
+        </p>
+      )}
 
       {participants.length === 0 && <p className="text-[13px] text-text-secondary">Katılımcı eklenmemiş.</p>}
       <div className="flex flex-col gap-2.5">
