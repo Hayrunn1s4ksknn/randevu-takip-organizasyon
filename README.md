@@ -1,6 +1,4 @@
-# Technoscope Randevu
-
-Mersin Teknopark / Technoscope için kurumsal randevu takip ve organizasyon sistemi — Next.js + Supabase ile üretim seviyesinde çalışan bir SaaS uygulaması. `design/Randevu Paneli.dc.html` tasarım prototipinin gerçek, veritabanı destekli ve canlıya alınmış hâli.
+#   Kurumsal randevu takip ve organizasyon sistemi — Next.js + Supabase ile üretim seviyesinde çalışan bir SaaS uygulaması. `design/Randevu Paneli.dc.html` tasarım prototipinin gerçek, veritabanı destekli ve canlıya alınmış hâli.
 
 ## Canlı Demo
 
@@ -120,12 +118,3 @@ docs/
   final-presentation.md     → final sunum notu
 ```
 
-## Bilinen Eksikler / Sonraki Adımlar
-
-- Resend'de özel domain doğrulanmadığı için gerçek müşteri e-postalarına gönderim sandbox kısıtına takılıyor — üretimde tam mail akışı için domain doğrulaması gerekiyor.
-- KVKK aydınlatma metni (`/privacy`) bir şablon; kurumun gerçek unvan/adres/iletişim bilgileriyle güncellenmeli.
-- Ayrı bir staging ortamı yok; geliştirme testleri doğrudan üretim Supabase projesine karşı (dikkatle, test verisi temizlenerek) yapılıyor.
-- Otomatik test kapsamı (Vitest/Playwright) sınırlı; çoğu doğrulama bu proje boyunca tek seferlik Playwright script'leriyle manuel yapıldı (bkz. `docs/test-checklist.md`).
-- Hata izleme (Sentry vb.) entegre değil.
-- `.vercel.app` alan adı kullanılıyor, özel bir `.com.tr` alan adı henüz bağlanmadı.
-- Randevu/görev "sorumlu kullanıcı" alanı eklendi ama toplu atama veya bildirim (sorumluya mail/anlık bildirim) gibi ikincil akışlar yok.
