@@ -42,8 +42,16 @@ export async function updateSession(request: NextRequest) {
   // page's HTML.
   const isApiRoute = pathname.startsWith('/api/')
   const isMfaRoute = pathname.startsWith('/verify-2fa')
+  // PWA install assets: the browser/OS fetches these before (and regardless
+  // of) sign-in to decide whether the site is installable, so gating them
+  // behind auth would silently break "Add to Home Screen".
+  const isPwaAssetRoute =
+    pathname === '/manifest.webmanifest' ||
+    pathname === '/icon' ||
+    pathname === '/apple-icon' ||
+    pathname.startsWith('/manifest-icons/')
 
-  if (!user && !isPublicRoute && !isApiRoute) {
+  if (!user && !isPublicRoute && !isApiRoute && !isPwaAssetRoute) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.searchParams.set('redirectTo', pathname)
@@ -60,7 +68,7 @@ export async function updateSession(request: NextRequest) {
   // (currentLevel behind nextLevel) must be routed to /verify-2fa before
   // reaching any protected page — otherwise a valid aal1 session alone would
   // be enough to bypass the enrolled second factor.
-  if (user && !isApiRoute) {
+  if (user && !isApiRoute && !isPwaAssetRoute) {
     let needsMfa = false
     try {
       const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { QueryProvider } from '@/components/query-provider'
@@ -13,6 +13,15 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Technoscope Randevu',
   description: 'Mersin Technoscope Kurumsal Randevu Takip ve Organizasyon Sistemi',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    title: 'Technoscope Randevu',
+    statusBarStyle: 'black-translucent',
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#1e3a8a',
 }
 
 const SYSTEM_THEME_SCRIPT = `
