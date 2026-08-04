@@ -107,3 +107,24 @@ export async function setUserBanned(userId: string, banned: boolean) {
 
   revalidatePath('/settings/users')
 }
+
+export async function deleteUser(userId: string) {
+  const adminSession = await requireAdminSession()
+  if (!adminSession) throw new Error('Bu işlem için yetkiniz yok.')
+
+  const admin = createAdminClient()
+  const { error } = await admin.auth.admin.deleteUser(userId)
+  if (error) {
+    // created_by/assigned_to columns don't cascade on purpose (losing who
+    // authored a record would be confusing) — Postgres blocks the delete
+    // with a foreign-key violation whenever the user has any history. GoTrue
+    // doesn't surface that as a readable message (just a generic 500), so
+    // rather than parse an opaque error we always point at the safe
+    // alternative instead of showing a cryptic failure.
+    throw new Error(
+      'Kullanıcı silinemedi. Muhtemelen oluşturduğu/sorumlu olduğu kayıtlar var — onun yerine devre dışı bırakabilirsiniz.'
+    )
+  }
+
+  revalidatePath('/settings/users')
+}

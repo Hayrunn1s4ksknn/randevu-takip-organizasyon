@@ -2,7 +2,7 @@
 
 import { useRef, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateUserRole, setUserBanned } from './user-management-actions'
+import { updateUserRole, setUserBanned, deleteUser } from './user-management-actions'
 import { useUiStore } from '@/store/ui'
 import type { UserListItem } from '@/services/users'
 
@@ -41,6 +41,24 @@ export function UserRow({ user, isSelf }: { user: UserListItem; isSelf: boolean 
       try {
         await setUserBanned(user.id, !user.banned)
         showToast(user.banned ? 'Kullanıcı etkinleştirildi' : 'Kullanıcı devre dışı bırakıldı')
+        router.refresh()
+      } catch (e) {
+        showToast(e instanceof Error ? e.message : 'İşlem başarısız oldu.')
+      }
+    })
+  }
+
+  function handleDelete() {
+    if (
+      !confirm(
+        `"${user.full_name ?? user.email}" kullanıcısını kalıcı olarak silmek istediğine emin misin? Bu işlem geri alınamaz.`
+      )
+    )
+      return
+    startTransition(async () => {
+      try {
+        await deleteUser(user.id)
+        showToast('Kullanıcı silindi')
         router.refresh()
       } catch (e) {
         showToast(e instanceof Error ? e.message : 'İşlem başarısız oldu.')
@@ -96,6 +114,13 @@ export function UserRow({ user, isSelf }: { user: UserListItem; isSelf: boolean 
         }}
       >
         {user.banned ? 'Etkinleştir' : 'Devre Dışı Bırak'}
+      </button>
+      <button
+        onClick={handleDelete}
+        disabled={isSelf || pending}
+        className="shrink-0 rounded-[9px] border border-danger px-3 py-1.5 text-[12px] font-bold text-danger disabled:opacity-50"
+      >
+        Sil
       </button>
     </div>
   )
