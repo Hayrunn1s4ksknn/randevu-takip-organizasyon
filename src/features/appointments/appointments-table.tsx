@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useUiStore } from '@/store/ui'
 import { STATUS_STYLE, PRIORITY_STYLE } from '@/lib/status-styles'
 import { onActivateKey } from '@/lib/a11y'
-import { bulkUpdateAppointmentStatus } from './actions'
+import { Modal, modalInputClass, ModalActions } from '@/components/modal'
+import { bulkUpdateAppointmentStatus, bulkPostponeAppointments } from './actions'
 import type { AppointmentPriority, AppointmentStatus } from '@/types/database'
 
 type Row = {
@@ -31,6 +32,7 @@ function isOverdue(row: Row, todayISO: string) {
 
 export function AppointmentsTable({ rows }: { rows: Row[] }) {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
+  const [postponeModalOpen, setPostponeModalOpen] = useState(false)
   const openDrawer = useUiStore((s) => s.openDrawer)
   const showToast = useUiStore((s) => s.showToast)
   const todayISO = new Date().toISOString().slice(0, 10)
@@ -59,6 +61,21 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
       router.refresh()
     })
   }
+  function handlePostpone(formData: FormData) {
+    const newDate = (formData.get('newDate') as string)?.trim() || null
+    const ids = [...selectedIds]
+    startTransition(async () => {
+      await bulkPostponeAppointments(ids, newDate)
+      setSelectedIds(new Set())
+      setPostponeModalOpen(false)
+      showToast(
+        newDate
+          ? `Seçili randevular ${new Date(`${newDate}T00:00:00`).toLocaleDateString('tr-TR')} tarihine ertelendi`
+          : 'Seçili randevular ertelendi'
+      )
+      router.refresh()
+    })
+  }
 
   return (
     <div>
@@ -76,7 +93,7 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
           </button>
           <button
             disabled={pending}
-            onClick={() => runBulk('Ertelendi', 'Seçili randevular ertelendi')}
+            onClick={() => setPostponeModalOpen(true)}
             className="cursor-pointer font-semibold disabled:opacity-50"
             style={{ color: 'var(--color-neutral)' }}
           >
@@ -236,6 +253,18 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
           })}
         </div>
       )}
+
+      <Modal open={postponeModalOpen} onClose={() => setPostponeModalOpen(false)} title="Randevuları Ertele">
+        <form action={handlePostpone} className="flex flex-col gap-3">
+          <p className="text-[13px] text-text-secondary">
+            <strong>{selectedIds.size}</strong> randevu için yeni bir tarih seçersen o tarihe kadar
+            &quot;Ertelendi&quot; olarak görünür, o tarih geldiğinde otomatik olarak &quot;Planlandı&quot;
+            (açık) durumuna döner. Tarih seçmezsen sadece &quot;Ertelendi&quot; olarak işaretlenir.
+          </p>
+          <input type="date" name="newDate" min={todayISO} className={modalInputClass} />
+          <ModalActions onCancel={() => setPostponeModalOpen(false)} submitLabel="Ertele" pending={pending} />
+        </form>
+      </Modal>
     </div>
   )
 }

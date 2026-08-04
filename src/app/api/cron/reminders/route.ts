@@ -13,6 +13,17 @@ export async function GET(request: Request) {
   }
 
   const admin = createAdminClient()
+
+  // Postponed appointments carry their new date but stay "Ertelendi" until
+  // that date actually arrives — flip them back to "Planlandı" (open) now
+  // that today has reached (or passed) it.
+  const todayISO = new Date().toISOString().slice(0, 10)
+  await admin
+    .from('appointments')
+    .update({ status: 'Planlandı' })
+    .eq('status', 'Ertelendi')
+    .lte('date', todayISO)
+
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
   const tomorrowISO = tomorrow.toISOString().slice(0, 10)

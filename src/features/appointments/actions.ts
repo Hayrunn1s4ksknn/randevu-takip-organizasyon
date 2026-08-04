@@ -116,6 +116,29 @@ export async function bulkUpdateAppointmentStatus(ids: number[], status: Appoint
   revalidatePath('/appointments')
 }
 
+export async function bulkPostponeAppointments(ids: number[], newDate: string | null) {
+  if (ids.length === 0) return
+  const supabase = await createClient()
+  const todayISO = new Date().toISOString().slice(0, 10)
+
+  // A future date keeps it as "Ertelendi" until that day actually arrives —
+  // the daily reminder cron flips it to "Planlandı" automatically then. If
+  // the picked date is today (the earliest the date input allows), it's
+  // already "arrived" so there's no reason to wait for tomorrow's cron run.
+  let update: { date?: string; status: AppointmentStatus }
+  if (!newDate) {
+    update = { status: 'Ertelendi' }
+  } else if (newDate <= todayISO) {
+    update = { date: newDate, status: 'Planlandı' }
+  } else {
+    update = { date: newDate, status: 'Ertelendi' }
+  }
+  await supabase.from('appointments').update(update).in('id', ids)
+  revalidatePath('/dashboard')
+  revalidatePath('/appointments')
+  revalidatePath('/calendar')
+}
+
 export async function deleteAppointment(id: number) {
   const supabase = await createClient()
 
