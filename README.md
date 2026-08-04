@@ -1,13 +1,8 @@
-#   Kurumsal randevu takip ve organizasyon sistemi — Next.js + Supabase ile üretim seviyesinde çalışan bir SaaS uygulaması. `design/Randevu Paneli.dc.html` tasarım prototipinin gerçek, veritabanı destekli ve canlıya alınmış hâli.
+# Kurumsal randevu takip ve organizasyon sistemi — Next.js + Supabase ile üretim seviyesinde çalışan bir SaaS uygulaması. `design/Randevu Paneli.dc.html` tasarım prototipinin gerçek, veritabanı destekli ve canlıya alınmış hâli.
 
 ## Canlı Demo
 
 - **URL:** https://randevu-takip-organizasyon.vercel.app
-- **Test kullanıcısı:**
-  - E-posta: `demo@technoscope-randevu.app`
-  - Şifre: `DemoTeknopark2026!`
-  - Rol: `personel` (randevu/görev/kişi/kurum oluşturma-düzenleme yetkisi var, kullanıcı yönetimi ve silme admin'e özel)
-  - Not: Bu hesapta 2FA kapalıdır, gerçek e-posta gönderimi Resend sandbox kısıtı nedeniyle yalnızca doğrulanmış test adreslerine gider.
 
 ## Teknolojiler
 
@@ -117,4 +112,3 @@ docs/
   ai-code-review.md         → AI destekli kod inceleme raporu
   final-presentation.md     → final sunum notu
 ```
-
