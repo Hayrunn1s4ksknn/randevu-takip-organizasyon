@@ -1,6 +1,6 @@
 # Kurumsal randevu takip ve organizasyon sistemi 
 
-— Next.js + Supabase ile üretim seviyesinde çalışan bir SaaS uygulaması. `design/Randevu Paneli.dc.html` tasarım prototipinin gerçek, veritabanı destekli ve canlıya alınmış hâli.
+— Next.js + Supabase ile üretim seviyesinde çalışan bir SaaS uygulaması.  
 
 ## Canlı Demo
 
