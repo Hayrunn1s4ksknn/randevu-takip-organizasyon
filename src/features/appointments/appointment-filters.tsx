@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-const STATUS_OPTIONS = ['Planlandı', 'Devam Ediyor', 'Tamamlandı', 'İptal Edildi']
+const STATUS_OPTIONS = ['Planlandı', 'Devam Ediyor', 'Tamamlandı', 'Ertelendi', 'İptal Edildi']
 
 export function AppointmentFilters({
   orgOptions,

@@ -2,11 +2,18 @@ import 'server-only'
 import { createClient } from '@/lib/supabase/server'
 import type { AppointmentStatus } from '@/types/database'
 
-const STATUS_ORDER: AppointmentStatus[] = ['Tamamlandı', 'Planlandı', 'Devam Ediyor', 'İptal Edildi']
+const STATUS_ORDER: AppointmentStatus[] = [
+  'Tamamlandı',
+  'Planlandı',
+  'Devam Ediyor',
+  'Ertelendi',
+  'İptal Edildi',
+]
 const STATUS_COLOR: Record<AppointmentStatus, string> = {
   Tamamlandı: 'var(--color-success)',
   Planlandı: 'var(--color-accent)',
   'Devam Ediyor': 'var(--color-warning)',
+  Ertelendi: 'var(--color-neutral)',
   'İptal Edildi': 'var(--color-danger)',
 }
 const MONTH_LABELS = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
@@ -126,7 +133,13 @@ export async function getDashboardData() {
   const doneTasks = tasks.filter((t) => t.status === 'done').length
 
   const overdueAppointments = appointments
-    .filter((a) => a.date < todayISO && a.status !== 'Tamamlandı' && a.status !== 'İptal Edildi')
+    .filter(
+      (a) =>
+        a.date < todayISO &&
+        a.status !== 'Tamamlandı' &&
+        a.status !== 'İptal Edildi' &&
+        a.status !== 'Ertelendi'
+    )
     .sort((a, b) => a.date.localeCompare(b.date))
     .map((a) => ({
       id: a.id,

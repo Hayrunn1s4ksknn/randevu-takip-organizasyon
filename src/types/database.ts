@@ -3,7 +3,7 @@
 // once the Supabase CLI is authenticated against the linked project.
 
 export type UserRole = 'admin' | 'yonetici' | 'personel' | 'misafir'
-export type AppointmentStatus = 'Planlandı' | 'Devam Ediyor' | 'Tamamlandı' | 'İptal Edildi'
+export type AppointmentStatus = 'Planlandı' | 'Devam Ediyor' | 'Tamamlandı' | 'İptal Edildi' | 'Ertelendi'
 export type AppointmentPriority = 'Düşük' | 'Orta' | 'Yüksek'
 export type TaskStatus = 'todo' | 'done'
 export type MeetingType = 'Online' | 'Fiziksel' | 'Telefon'

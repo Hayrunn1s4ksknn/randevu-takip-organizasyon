@@ -5,6 +5,7 @@ export const STATUS_STYLE: Record<AppointmentStatus, { bg: string; color: string
   'İptal Edildi': { bg: 'var(--color-danger-bg)', color: '#B91C1C' },
   Planlandı: { bg: 'var(--color-accent-bg)', color: '#1D4ED8' },
   'Devam Ediyor': { bg: 'var(--color-warning-bg)', color: '#B45309' },
+  Ertelendi: { bg: 'var(--color-neutral-bg)', color: '#6D28D9' },
 }
 
 export const PRIORITY_STYLE: Record<AppointmentPriority, { bg: string; color: string }> = {

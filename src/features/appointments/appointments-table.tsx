@@ -21,7 +21,12 @@ type Row = {
 }
 
 function isOverdue(row: Row, todayISO: string) {
-  return row.date < todayISO && row.status !== 'Tamamlandı' && row.status !== 'İptal Edildi'
+  return (
+    row.date < todayISO &&
+    row.status !== 'Tamamlandı' &&
+    row.status !== 'İptal Edildi' &&
+    row.status !== 'Ertelendi'
+  )
 }
 
 export function AppointmentsTable({ rows }: { rows: Row[] }) {
@@ -68,6 +73,14 @@ export function AppointmentsTable({ rows }: { rows: Row[] }) {
             className="ml-auto cursor-pointer font-semibold text-success disabled:opacity-50"
           >
             Tamamlandı yap
+          </button>
+          <button
+            disabled={pending}
+            onClick={() => runBulk('Ertelendi', 'Seçili randevular ertelendi')}
+            className="cursor-pointer font-semibold disabled:opacity-50"
+            style={{ color: 'var(--color-neutral)' }}
+          >
+            Ertele
           </button>
           <button
             disabled={pending}

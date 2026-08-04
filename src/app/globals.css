@@ -20,6 +20,9 @@
   --color-warning-bg: rgba(245, 158, 11, 0.13);
   --color-danger-bg: rgba(239, 68, 68, 0.12);
   --color-accent-bg: rgba(37, 99, 235, 0.1);
+
+  --color-neutral: #7c3aed;
+  --color-neutral-bg: rgba(124, 58, 237, 0.11);
 }
 
 .dark {
@@ -40,6 +43,9 @@
   --color-warning-bg: rgba(245, 158, 11, 0.16);
   --color-danger-bg: rgba(239, 68, 68, 0.18);
   --color-accent-bg: rgba(59, 130, 246, 0.16);
+
+  --color-neutral: #a78bfa;
+  --color-neutral-bg: rgba(167, 139, 250, 0.18);
 }
 
 @theme inline {
@@ -58,6 +64,8 @@
   --color-warning-bg: var(--color-warning-bg);
   --color-danger-bg: var(--color-danger-bg);
   --color-accent-bg: var(--color-accent-bg);
+  --color-neutral: var(--color-neutral);
+  --color-neutral-bg: var(--color-neutral-bg);
   --font-sans: var(--font-inter);
 }
 
