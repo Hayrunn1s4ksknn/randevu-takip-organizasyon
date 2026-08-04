@@ -38,6 +38,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         staffOptions={staffOptions}
         appointmentOptions={appointmentOptions}
         userId={user.id}
+        isAdmin={profile?.role === 'admin'}
       >
         {children}
       </AppShellClient>

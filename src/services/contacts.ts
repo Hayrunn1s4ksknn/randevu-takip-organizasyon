@@ -5,7 +5,7 @@ const SELECT = 'id, name, position, company_id, phone, email, tags, last_contact
 
 export async function getContactsList(search?: string) {
   const supabase = await createClient()
-  let query = supabase.from('contacts').select(SELECT)
+  let query = supabase.from('contacts').select(SELECT).is('deleted_at', null)
   if (search?.trim()) query = query.ilike('name', `%${search.trim()}%`)
 
   const { data } = await query.order('name', { ascending: true })
@@ -14,6 +14,6 @@ export async function getContactsList(search?: string) {
 
 export async function getContactOptions() {
   const supabase = await createClient()
-  const { data } = await supabase.from('contacts').select('id, name').order('name')
+  const { data } = await supabase.from('contacts').select('id, name').is('deleted_at', null).order('name')
   return data ?? []
 }

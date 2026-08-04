@@ -61,6 +61,7 @@ type Contacts = {
     notes: string | null
     tags: string[]
     last_contact: string | null
+    deleted_at: string | null
     created_by: string | null
     created_at: string
   }

@@ -1,10 +1,13 @@
 'use client'
 
+import { useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { useUiStore } from '@/store/ui'
 import { useSwipeToClose } from '@/hooks/use-swipe-to-close'
 import { Modal } from '@/components/modal'
 import { EditContactForm } from './edit-contact-form'
+import { softDeleteContact } from './actions'
 import { STATUS_STYLE } from '@/lib/status-styles'
 import type { AppointmentStatus } from '@/types/database'
 
@@ -31,6 +34,9 @@ export function ContactDrawer({ orgOptions }: { orgOptions: { id: number; name: 
   const editTargetId = useUiStore((s) => s.editTargetId)
   const openModal = useUiStore((s) => s.openModal)
   const closeModal = useUiStore((s) => s.closeModal)
+  const showToast = useUiStore((s) => s.showToast)
+  const router = useRouter()
+  const [pending, startTransition] = useTransition()
   const swipeHandlers = useSwipeToClose(closeContactDrawer)
 
   const { data } = useQuery<ContactDetail>({
@@ -45,6 +51,18 @@ export function ContactDrawer({ orgOptions }: { orgOptions: { id: number; name: 
   if (contactDrawerId === null) return null
 
   const c = data?.contact
+
+  function handleDelete() {
+    if (!c) return
+    if (!confirm(`"${c.name}" kişisini silmek istediğine emin misin?`)) return
+    startTransition(async () => {
+      await softDeleteContact(c.id)
+      closeContactDrawer()
+      showToast('Kişi silindi')
+      router.refresh()
+    })
+  }
+
   const initials = c?.name
     ?.split(' ')
     .map((w) => w[0])
@@ -110,12 +128,21 @@ export function ContactDrawer({ orgOptions }: { orgOptions: { id: number; name: 
               </div>
             )}
 
-            <button
-              onClick={() => openModal('edit-contact', c.id)}
-              className="mt-6 rounded-[9px] border border-border px-4 py-2.5 text-[12.5px] font-bold"
-            >
-              Düzenle
-            </button>
+            <div className="mt-6 flex gap-2.5">
+              <button
+                onClick={() => openModal('edit-contact', c.id)}
+                className="flex-1 rounded-[9px] border border-border px-4 py-2.5 text-[12.5px] font-bold"
+              >
+                Düzenle
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={pending}
+                className="rounded-[9px] border border-danger px-4 py-2.5 text-[12.5px] font-bold text-danger disabled:opacity-50"
+              >
+                Sil
+              </button>
+            </div>
           </>
         )}
       </div>

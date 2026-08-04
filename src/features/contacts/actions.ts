@@ -76,3 +76,15 @@ export async function updateContact(
   revalidatePath('/contacts')
   return { success: true }
 }
+
+export async function softDeleteContact(id: number) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('contacts')
+    .update({ deleted_at: new Date().toISOString() })
+    .eq('id', id)
+  if (error) throw new Error('Kişi silinemedi.')
+
+  revalidatePath('/dashboard')
+  revalidatePath('/contacts')
+}

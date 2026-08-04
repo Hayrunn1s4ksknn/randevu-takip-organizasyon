@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
   const like = `%${q}%`
 
   const [contacts, organizations, appointments] = await Promise.all([
-    supabase.from('contacts').select('id, name').ilike('name', like).limit(4),
-    supabase.from('organizations').select('id, name').ilike('name', like).limit(4),
+    supabase.from('contacts').select('id, name').is('deleted_at', null).ilike('name', like).limit(4),
+    supabase.from('organizations').select('id, name').is('deleted_at', null).ilike('name', like).limit(4),
     supabase.from('appointments').select('id, title').ilike('title', like).limit(4),
   ])
 

@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, type ChangeEvent } from 'react'
+import { useState, useTransition, type ChangeEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useUiStore } from '@/store/ui'
 import { useSwipeToClose } from '@/hooks/use-swipe-to-close'
 import { STATUS_STYLE } from '@/lib/status-styles'
+import { deleteAppointment } from './actions'
 import type { AppointmentStatus, MeetingType } from '@/types/database'
 
 const TABS = [
@@ -497,13 +499,18 @@ function ParticipantsTab({
 export function AppointmentDrawer({
   contactOptions,
   staffOptions,
+  isAdmin,
 }: {
   contactOptions: { id: number; name: string }[]
   staffOptions: { id: string; name: string }[]
+  isAdmin: boolean
 }) {
   const drawerApptId = useUiStore((s) => s.drawerApptId)
   const closeDrawer = useUiStore((s) => s.closeDrawer)
+  const showToast = useUiStore((s) => s.showToast)
+  const router = useRouter()
   const [tab, setTab] = useState<TabKey>('notlar')
+  const [deleting, startDeleteTransition] = useTransition()
   const queryClient = useQueryClient()
   const swipeHandlers = useSwipeToClose(closeDrawer)
 
@@ -522,6 +529,17 @@ export function AppointmentDrawer({
 
   const a = data?.appointment
   const statusStyle = a ? STATUS_STYLE[a.status] : null
+
+  function handleDelete() {
+    if (!a || drawerApptId === null) return
+    if (!confirm(`"${a.title}" randevusunu kalıcı olarak silmek istediğine emin misin?`)) return
+    startDeleteTransition(async () => {
+      await deleteAppointment(drawerApptId)
+      closeDrawer()
+      showToast('Randevu silindi')
+      router.refresh()
+    })
+  }
 
   return (
     <>
@@ -568,12 +586,24 @@ export function AppointmentDrawer({
               </div>
             )}
           </div>
-          <button
-            onClick={closeDrawer}
-            className="flex h-11 w-11 items-center justify-center text-xl leading-none text-text-secondary"
-          >
-            ×
-          </button>
+          <div className="flex shrink-0 items-center gap-1">
+            {a && isAdmin && (
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                title="Randevuyu sil"
+                className="flex h-11 w-11 items-center justify-center rounded-[9px] text-danger disabled:opacity-50"
+              >
+                🗑
+              </button>
+            )}
+            <button
+              onClick={closeDrawer}
+              className="flex h-11 w-11 items-center justify-center text-xl leading-none text-text-secondary"
+            >
+              ×
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-1 border-b border-border px-6 pt-3">

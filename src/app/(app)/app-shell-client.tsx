@@ -34,6 +34,7 @@ export function AppShellClient({
   staffOptions,
   appointmentOptions,
   userId,
+  isAdmin,
 }: {
   children: React.ReactNode
   fullName: string
@@ -44,6 +45,7 @@ export function AppShellClient({
   staffOptions: { id: string; name: string }[]
   appointmentOptions: { id: number; title: string }[]
   userId: string
+  isAdmin: boolean
 }) {
   const pathname = usePathname()
   const pageTitle = Object.entries(PAGE_TITLES).find(([prefix]) => pathname.startsWith(prefix))?.[1] ?? ''
@@ -61,7 +63,7 @@ export function AppShellClient({
         staffOptions={staffOptions}
         appointmentOptions={appointmentOptions}
       />
-      <AppointmentDrawer contactOptions={contactOptions} staffOptions={staffOptions} />
+      <AppointmentDrawer contactOptions={contactOptions} staffOptions={staffOptions} isAdmin={isAdmin} />
       <ContactDrawer orgOptions={orgOptions} />
       <OrganizationDrawer />
       <BottomNav />

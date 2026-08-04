@@ -37,7 +37,7 @@ export async function getDashboardData() {
       .select('id, description, created_at, profiles(full_name)')
       .order('created_at', { ascending: false })
       .limit(5),
-    supabase.from('contacts').select('id', { count: 'exact', head: true }),
+    supabase.from('contacts').select('id', { count: 'exact', head: true }).is('deleted_at', null),
   ])
 
   const appointments = appointmentsRes.data ?? []

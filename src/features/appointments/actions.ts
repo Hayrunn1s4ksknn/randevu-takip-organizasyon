@@ -115,3 +115,25 @@ export async function bulkUpdateAppointmentStatus(ids: number[], status: Appoint
   revalidatePath('/dashboard')
   revalidatePath('/appointments')
 }
+
+export async function deleteAppointment(id: number) {
+  const supabase = await createClient()
+
+  // Related rows (notes/comments/participants/status history/emails) cascade
+  // via FK, but the actual Storage objects behind appointment_files don't —
+  // those have to be removed explicitly or they'd leak in the bucket forever.
+  const { data: files } = await supabase
+    .from('appointment_files')
+    .select('storage_path')
+    .eq('appointment_id', id)
+  if (files && files.length > 0) {
+    await supabase.storage.from('appointment-files').remove(files.map((f) => f.storage_path))
+  }
+
+  const { error } = await supabase.from('appointments').delete().eq('id', id)
+  if (error) throw new Error('Randevu silinemedi.')
+
+  revalidatePath('/dashboard')
+  revalidatePath('/appointments')
+  revalidatePath('/calendar')
+}
