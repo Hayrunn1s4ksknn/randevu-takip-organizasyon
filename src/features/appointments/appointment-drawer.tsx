@@ -499,11 +499,11 @@ function ParticipantsTab({
 export function AppointmentDrawer({
   contactOptions,
   staffOptions,
-  isAdmin,
+  canDeleteAppointments,
 }: {
   contactOptions: { id: number; name: string }[]
   staffOptions: { id: string; name: string }[]
-  isAdmin: boolean
+  canDeleteAppointments: boolean
 }) {
   const drawerApptId = useUiStore((s) => s.drawerApptId)
   const closeDrawer = useUiStore((s) => s.closeDrawer)
@@ -587,7 +587,7 @@ export function AppointmentDrawer({
             )}
           </div>
           <div className="flex shrink-0 items-center gap-1">
-            {a && isAdmin && (
+            {a && canDeleteAppointments && (
               <button
                 onClick={handleDelete}
                 disabled={deleting}

@@ -38,7 +38,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         staffOptions={staffOptions}
         appointmentOptions={appointmentOptions}
         userId={user.id}
-        isAdmin={profile?.role === 'admin'}
+        canDeleteAppointments={['admin', 'yonetici', 'personel'].includes(profile?.role ?? '')}
       >
         {children}
       </AppShellClient>
