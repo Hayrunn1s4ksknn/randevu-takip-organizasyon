@@ -49,7 +49,9 @@ export async function updateSession(request: NextRequest) {
     pathname === '/manifest.webmanifest' ||
     pathname === '/icon' ||
     pathname === '/apple-icon' ||
-    pathname.startsWith('/manifest-icons/')
+    pathname.startsWith('/manifest-icons/') ||
+    pathname === '/sw.js' ||
+    pathname === '/offline.html'
 
   if (!user && !isPublicRoute && !isApiRoute && !isPwaAssetRoute) {
     const url = request.nextUrl.clone()

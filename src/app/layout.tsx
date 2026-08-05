@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { QueryProvider } from '@/components/query-provider'
+import { ServiceWorkerRegister } from '@/components/service-worker-register'
 import { getCurrentUserAndProfile } from '@/services/profile'
 
 const inter = Inter({
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <head>{!darkModeKnown && <script dangerouslySetInnerHTML={{ __html: SYSTEM_THEME_SCRIPT }} />}</head>
       <body className="h-full">
+        <ServiceWorkerRegister />
         <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
