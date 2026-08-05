@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getCurrentUserAndProfile } from '@/services/profile'
 import { DarkModeToggle } from '@/features/settings/dark-mode-toggle'
+import { NotificationToggle } from '@/features/settings/notification-toggle'
 import { EditNameForm } from '@/features/settings/edit-name-form'
 import { ChangePasswordForm } from '@/features/settings/change-password-form'
 import { TwoFactorSection } from '@/features/settings/two-factor-section'
@@ -38,6 +39,18 @@ export default async function SettingsPage() {
         <div className="flex items-center justify-between py-2.5">
           <span className="text-[13px]">Karanlık Mod</span>
           <DarkModeToggle initialIsDark={profile?.dark_mode ?? false} />
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-border bg-surface-solid p-[22px]">
+        <div className="mb-1 text-[14.5px] font-bold">Bildirimler</div>
+        <p className="mb-3 text-[12.5px] text-text-secondary">
+          Bu sekme/pencere açıkken, günün randevuları için başlamadan 15 dakika önce ve tam randevu saatinde
+          masaüstü bildirimi gönderilsin.
+        </p>
+        <div className="flex items-center justify-between py-2.5">
+          <span className="text-[13px]">Masaüstü Bildirimleri</span>
+          <NotificationToggle />
         </div>
       </section>
 

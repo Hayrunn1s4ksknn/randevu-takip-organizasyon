@@ -5,6 +5,7 @@ import { Topbar } from '@/components/topbar'
 import { SearchPalette } from '@/components/search-palette'
 import { ToastContainer } from '@/components/toast-container'
 import { RealtimeNotifier } from '@/components/realtime-notifier'
+import { AppointmentReminderNotifier } from '@/components/appointment-reminder-notifier'
 import { QuickActionModals } from '@/components/quick-action-modals'
 import { AppointmentDrawer } from '@/features/appointments/appointment-drawer'
 import { ContactDrawer } from '@/features/contacts/contact-drawer'
@@ -57,6 +58,7 @@ export function AppShellClient({
       <SearchPalette />
       <ToastContainer />
       <RealtimeNotifier userId={userId} />
+      <AppointmentReminderNotifier />
       <QuickActionModals
         orgOptions={orgOptions}
         contactOptions={contactOptions}
