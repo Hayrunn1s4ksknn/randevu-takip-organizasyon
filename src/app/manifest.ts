@@ -15,5 +15,12 @@ export default function manifest(): MetadataRoute.Manifest {
       { src: '/manifest-icons/512', sizes: '512x512', type: 'image/png', purpose: 'any' },
       { src: '/manifest-icons/512-maskable', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
+    shortcuts: [
+      {
+        name: 'Bugünün Randevuları',
+        url: '/widget',
+        icons: [{ src: '/manifest-icons/192', sizes: '192x192', type: 'image/png' }],
+      },
+    ],
   }
 }

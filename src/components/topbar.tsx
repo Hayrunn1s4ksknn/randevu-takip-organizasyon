@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react'
 import Link from 'next/link'
-import { Menu, House, Settings, Sun, Moon } from 'lucide-react'
+import { Menu, House, Settings, Sun, Moon, AppWindow } from 'lucide-react'
 import { useUiStore } from '@/store/ui'
 import { toggleDarkMode } from '@/features/settings/actions'
 import { UserMenu } from '@/components/user-menu'
@@ -44,6 +44,20 @@ export function Topbar({
         </button>
       </div>
       <div className="ml-2.5 flex shrink-0 items-center gap-2 md:gap-2.5">
+        <button
+          onClick={() =>
+            window.open(
+              '/widget',
+              'technoscope-randevu-widget',
+              'width=340,height=520,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes'
+            )
+          }
+          aria-label="Randevu Widget'ı Aç"
+          title="Randevu Widget'ı Aç"
+          className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-[9px] border border-border bg-bg text-text-secondary hover:border-accent hover:text-accent md:flex"
+        >
+          <AppWindow size={19} />
+        </button>
         <Link
           href="/dashboard"
           aria-label="Ana Sayfa"

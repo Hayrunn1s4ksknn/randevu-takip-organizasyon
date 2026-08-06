@@ -72,3 +72,14 @@ export async function getAppointmentOptions() {
     .limit(200)
   return data ?? []
 }
+
+export async function getTodayAppointmentsForWidget() {
+  const supabase = await createClient()
+  const todayISO = new Date().toISOString().slice(0, 10)
+  const { data } = await supabase
+    .from('appointments')
+    .select('id, title, time, status, organizations(name)')
+    .eq('date', todayISO)
+    .order('time', { ascending: true, nullsFirst: false })
+  return data ?? []
+}
