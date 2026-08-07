@@ -3,6 +3,7 @@ import { getCurrentUserAndProfile } from '@/services/profile'
 import { getTodayAppointmentsForWidget } from '@/services/appointments'
 import { STATUS_STYLE } from '@/lib/status-styles'
 import { WidgetAutoRefresh } from './widget-auto-refresh'
+import { AppointmentReminderNotifier } from '@/components/appointment-reminder-notifier'
 
 export const metadata = { title: 'Bugünün Randevuları — Technoscope Randevu' }
 
@@ -20,6 +21,7 @@ export default async function WidgetPage() {
   return (
     <div className="flex h-screen flex-col bg-bg text-text-primary">
       <WidgetAutoRefresh />
+      <AppointmentReminderNotifier />
       <div className="shrink-0 border-b border-border bg-surface-solid px-4 py-3.5">
         <div className="text-[11px] font-semibold tracking-[0.3px] text-text-secondary">{todayLabel}</div>
         <div className="text-[14.5px] font-bold">Bugünün Randevuları</div>
