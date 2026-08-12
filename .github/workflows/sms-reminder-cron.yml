@@ -21,3 +21,10 @@ jobs:
           curl --fail-with-body -sS \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "https://randevu-takip-organizasyon.vercel.app/api/cron/sms-reminders"
+
+      - name: Alert owner on failure
+        if: failure()
+        run: |
+          curl -sS \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://randevu-takip-organizasyon.vercel.app/api/cron/sms-reminders/alert"
