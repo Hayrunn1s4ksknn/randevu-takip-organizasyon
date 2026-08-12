@@ -1,0 +1,23 @@
+name: SMS Reminder Cron
+
+# Vercel's free plan only allows a once-daily scheduled job, which isn't
+# precise enough for "1 hour before the appointment" SMS reminders. This
+# workflow polls the app's cron endpoint every 15 minutes during Turkish
+# business hours (05:00-18:00 UTC = 08:00-21:00 Istanbul) instead.
+#
+# Requires a repository secret named CRON_SECRET with the same value as the
+# CRON_SECRET environment variable set in Vercel.
+on:
+  schedule:
+    - cron: '*/15 5-18 * * *'
+  workflow_dispatch:
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call SMS reminder endpoint
+        run: |
+          curl --fail-with-body -sS \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "https://randevu-takip-organizasyon.vercel.app/api/cron/sms-reminders"

@@ -99,6 +99,7 @@ type Appointments = {
     created_at: string
     updated_at: string
     reminder_sent_at: string | null
+    sms_reminder_sent_at: string | null
     meeting_type: MeetingType | null
     duration_minutes: number | null
     assigned_to: string | null
@@ -355,6 +356,41 @@ type AppointmentEmails = {
   ]
 }
 
+type AppointmentSms = {
+  Row: {
+    id: number
+    appointment_id: number
+    sent_by: string | null
+    to_phone: string
+    message: string
+    kind: 'reminder' | 'manual'
+    sent_at: string
+  }
+  Insert: Partial<AppointmentSms['Row']> & {
+    appointment_id: number
+    to_phone: string
+    message: string
+    kind: 'reminder' | 'manual'
+  }
+  Update: Partial<AppointmentSms['Row']>
+  Relationships: [
+    {
+      foreignKeyName: 'appointment_sms_appointment_id_fkey'
+      columns: ['appointment_id']
+      isOneToOne: false
+      referencedRelation: 'appointments'
+      referencedColumns: ['id']
+    },
+    {
+      foreignKeyName: 'appointment_sms_sent_by_fkey'
+      columns: ['sent_by']
+      isOneToOne: false
+      referencedRelation: 'profiles'
+      referencedColumns: ['id']
+    },
+  ]
+}
+
 type Activities = {
   Row: { id: number; user_id: string | null; action_type: string; description: string; created_at: string }
   Insert: Partial<Activities['Row']> & { action_type: string; description: string }
@@ -383,6 +419,7 @@ export interface Database {
       appointment_status_history: AppointmentStatusHistory
       appointment_files: AppointmentFiles
       appointment_emails: AppointmentEmails
+      appointment_sms: AppointmentSms
       tasks: Tasks
       activities: Activities
       auth_attempts: AuthAttempts
