@@ -14,6 +14,13 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 
+  // All reminders go to one internal number (the person tracking
+  // appointments), not to each organization's own phone — this is an
+  // internal "your meeting is starting soon" nudge, not a message to the
+  // client.
+  const reminderPhone = process.env.REMINDER_PHONE
+  if (!reminderPhone) return NextResponse.json({ error: 'REMINDER_PHONE tanımlı değil' }, { status: 500 })
+
   const admin = createAdminClient()
   const now = new Date()
   const todayISO = now.toISOString().slice(0, 10)
@@ -23,7 +30,7 @@ export async function GET(request: Request) {
 
   const { data: appointments } = await admin
     .from('appointments')
-    .select('id, title, time, organizations(phone)')
+    .select('id, title, time, organizations(name)')
     .eq('date', todayISO)
     .is('sms_reminder_sent_at', null)
     .in('status', ['Planlandı', 'Devam Ediyor'])
@@ -33,16 +40,15 @@ export async function GET(request: Request) {
 
   let sent = 0
   for (const appt of appointments ?? []) {
-    const org = appt.organizations as unknown as { phone: string | null } | null
-    if (!org?.phone) continue
-
-    const message = `Hatırlatma: "${appt.title}" randevunuz saat ${appt.time?.slice(0, 5)} başlıyor. - Technoscope Randevu`
+    const org = appt.organizations as unknown as { name: string | null } | null
+    const orgLabel = org?.name ? ` (${org.name})` : ''
+    const message = `Hatırlatma: "${appt.title}"${orgLabel} randevusu saat ${appt.time?.slice(0, 5)} başlıyor. - Technoscope Randevu`
 
     try {
-      await sendSms({ to: org.phone, message })
+      await sendSms({ to: reminderPhone, message })
       await admin.from('appointment_sms').insert({
         appointment_id: appt.id,
-        to_phone: org.phone,
+        to_phone: reminderPhone,
         message,
         kind: 'reminder',
       })
