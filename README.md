@@ -1,6 +1,6 @@
-# Kurumsal randevu takip ve organizasyon sistemi 
+# Kurumsal randevu takip ve organizasyon sistemi
 
-— Next.js + Supabase ile üretim seviyesinde çalışan bir SaaS uygulaması.  
+— Next.js + Supabase ile üretim seviyesinde çalışan bir SaaS uygulaması.
 
 ## Canlı Demo
 
@@ -30,7 +30,29 @@ npm run dev
 
 ### Supabase şemasını uygulama
 
-Bkz. [`supabase/README.md`](./supabase/README.md) — migration dosyalarını CLI veya Dashboard SQL Editor ile uygulama adımları. Migration'lar `supabase/migrations/0001` → `0012` arası sırayla uygulanmalıdır.
+Bkz. [`supabase/README.md`](./supabase/README.md) — migration dosyalarını CLI veya Dashboard SQL Editor ile uygulama adımları. Migration'lar `supabase/migrations/0001` → `0017` arası sırayla uygulanmalıdır.
+
+### Test / Staging Ortamı
+
+Testler (özellikle Playwright E2E) production Supabase projesine karşı **çalıştırılmamalı**. Bunun için ayrı, boş bir Supabase projesi ("randevu-takip-staging") var; production ile aynı şemayı taşır (aynı migration'lar uygulanmıştır) ama verisi tamamen ayrıdır.
+
+Yerel olarak test çalıştırmak için proje kökünde bir `.env.test.local` dosyası oluşturun (git'e girmez):
+
+```
+NEXT_PUBLIC_SUPABASE_URL=<staging proje URL'i>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<staging anon/publishable anahtarı>
+SUPABASE_SERVICE_ROLE_KEY=<staging service role/secret anahtarı>
+CRON_SECRET=<herhangi bir değer, dışarıdan çağrılmıyor>
+```
+
+`npm run test:e2e` bu dosyayı otomatik okuyup test sunucusuna aktarır (`playwright.config.ts`) — dosya yoksa test çalışmaz, böylece yanlışlıkla production'a karşı test çalıştırma riski engellenmiş olur.
+
+**Önemli:** Şemada bir değişiklik (yeni migration) yapıldığında, hem production'a hem staging projesine ayrı ayrı uygulanmalıdır — otomatik senkronizasyon yoktur:
+
+```bash
+npx supabase db push --linked                                          # production
+npx supabase db push --project-ref <staging-ref> --password <db-şifresi>  # staging
+```
 
 ### Ortam Değişkenleri
 
