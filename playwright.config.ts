@@ -32,7 +32,14 @@ function loadTestEnv(): Record<string, string> {
 
 export default defineConfig({
   testDir: './tests/e2e',
+  globalSetup: require.resolve('./tests/e2e/global-setup.ts'),
   fullyParallel: true,
+  // This is a small suite (a handful of specs) sharing one local
+  // `next start` process. Parallel workers cause real contention — server
+  // responses slow down enough under concurrent load to blow past assertion
+  // timeouts even though the mutation succeeds — without buying much wall
+  // clock time back, so run serially for reliability.
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: 'html',

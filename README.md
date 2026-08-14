@@ -47,6 +47,17 @@ CRON_SECRET=<herhangi bir değer, dışarıdan çağrılmıyor>
 
 `npm run test:e2e` bu dosyayı otomatik okuyup test sunucusuna aktarır (`playwright.config.ts`) — dosya yoksa test çalışmaz, böylece yanlışlıkla production'a karşı test çalıştırma riski engellenmiş olur.
 
+E2E testleri ilk çalıştırıldığında (`tests/e2e/global-setup.ts`) staging'de üç kalıcı test kullanıcısı oluşturur (admin/personel/misafir rollerinde — `tests/e2e/fixtures.ts`); bu hesaplar tekrar tekrar kullanılır, her çalıştırmada silinip yeniden oluşturulmaz. Kapsam:
+
+- `appointments.spec.ts` — randevu oluşturma, kuruma bağlama, "Ertele" akışı, silme
+- `permissions.spec.ts` — admin/personel randevu silebiliyor, misafir silemiyor (rol yetkisi regresyonu)
+- `mobile-menu.spec.ts` — mobil hamburger menünün gerçekten ekrana kayıp geldiğini doğrular (bir Tailwind v4 güncellemesinin sessizce kırdığı gerçek bir bug'ın regresyon testi)
+- `login.spec.ts` — giriş formu doğrulaması
+
+Testler tek worker ile (seri) çalışır — küçük bir suite tek bir yerel `next start` sürecini paylaştığı için paralel çalıştırmak gerçek bir kazanç sağlamadan sunucu gecikmesinden kaynaklı kararsızlık (flaky test) yaratıyor.
+
+Vitest birim testleri (`tests/unit/`) ise `src/lib/tr-time.ts` (Türkiye saat dilimi hesapları) ve `src/lib/phone.ts` (telefon normalizasyonu) gibi, üretimde gerçekten yaşanmış hataların regresyon koruması içindir.
+
 **Önemli:** Şemada bir değişiklik (yeni migration) yapıldığında, hem production'a hem staging projesine ayrı ayrı uygulanmalıdır — otomatik senkronizasyon yoktur:
 
 ```bash

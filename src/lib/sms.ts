@@ -1,4 +1,5 @@
 import 'server-only'
+import { normalizeTurkishPhone } from '@/lib/phone'
 
 const SEND_URL = 'https://api.netgsm.com.tr/sms/send/xml'
 const BALANCE_URL = 'https://api.netgsm.com.tr/get_kredi.asp'
@@ -17,16 +18,6 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 function xmlEscape(value: string) {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-}
-
-// Accepts local Turkish formats ("0532 111 22 33", "5321112233",
-// "+90 532 111 22 33") and normalizes to NetGSM's expected "90XXXXXXXXXX".
-export function normalizeTurkishPhone(raw: string): string | null {
-  const digits = raw.replace(/\D/g, '')
-  if (digits.length === 10 && digits.startsWith('5')) return `90${digits}`
-  if (digits.length === 11 && digits.startsWith('05')) return `90${digits.slice(1)}`
-  if (digits.length === 12 && digits.startsWith('90')) return digits
-  return null
 }
 
 export async function sendSms({ to, message }: { to: string; message: string }) {

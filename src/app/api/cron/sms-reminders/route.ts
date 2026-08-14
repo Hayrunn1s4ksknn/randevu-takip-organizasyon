@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendSms } from '@/lib/sms'
+import { reminderWindow } from '@/lib/tr-time'
 
 // Triggered every ~15 minutes by an external scheduler (GitHub Actions —
 // Vercel's free plan only allows a once-daily cron, which isn't enough for
@@ -22,17 +23,7 @@ export async function GET(request: Request) {
   if (!reminderPhone) return NextResponse.json({ error: 'REMINDER_PHONE tanımlı değil' }, { status: 500 })
 
   const admin = createAdminClient()
-
-  // appointments.time is entered (and stored, with no timezone) as Turkey
-  // local time — but Vercel's serverless functions run in UTC. Comparing a
-  // UTC-based `now` against those naive local times would silently miss
-  // every appointment by ~3 hours. Turkey has used a fixed UTC+3 offset
-  // with no DST since 2016, so a flat offset is safe here.
-  const nowTR = new Date(Date.now() + 3 * 60 * 60 * 1000)
-  const todayISO = nowTR.toISOString().slice(0, 10)
-  const nowHHMMSS = nowTR.toISOString().slice(11, 19)
-  const windowEndTR = new Date(nowTR.getTime() + 60 * 60 * 1000)
-  const windowEndHHMMSS = windowEndTR.toISOString().slice(11, 19)
+  const { todayISO, nowHHMMSS, windowEndHHMMSS } = reminderWindow(60)
 
   const { data: appointments } = await admin
     .from('appointments')
