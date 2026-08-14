@@ -58,6 +58,19 @@ Testler tek worker ile (seri) çalışır — küçük bir suite tek bir yerel `
 
 Vitest birim testleri (`tests/unit/`) ise `src/lib/tr-time.ts` (Türkiye saat dilimi hesapları) ve `src/lib/phone.ts` (telefon normalizasyonu) gibi, üretimde gerçekten yaşanmış hataların regresyon koruması içindir.
 
+#### CI (GitHub Actions)
+
+`.github/workflows/ci.yml` her `main`'e push/PR'da lint, typecheck, unit test, build ve E2E testlerini otomatik çalıştırır. Bunun için repo'ya (Settings → Secrets and variables → Actions → **Repository secrets**) yukarıdaki `.env.test.local` ile **aynı staging değerlerini** şu isimlerle eklemek gerekir:
+
+| Secret adı                          | Değer                                               |
+| ----------------------------------- | --------------------------------------------------- |
+| `STAGING_SUPABASE_URL`              | `.env.test.local` → `NEXT_PUBLIC_SUPABASE_URL`      |
+| `STAGING_SUPABASE_ANON_KEY`         | `.env.test.local` → `NEXT_PUBLIC_SUPABASE_ANON_KEY` |
+| `STAGING_SUPABASE_SERVICE_ROLE_KEY` | `.env.test.local` → `SUPABASE_SERVICE_ROLE_KEY`     |
+| `STAGING_CRON_SECRET`               | `.env.test.local` → `CRON_SECRET`                   |
+
+Bu secret'lar kesinlikle production değerleri **olmamalı** — GitHub Actions'ın production'a erişebileceği başka bir yol yok, bu yüzden isimlendirme bilinçli olarak "staging" içeriyor.
+
 **Önemli:** Şemada bir değişiklik (yeni migration) yapıldığında, hem production'a hem staging projesine ayrı ayrı uygulanmalıdır — otomatik senkronizasyon yoktur:
 
 ```bash
