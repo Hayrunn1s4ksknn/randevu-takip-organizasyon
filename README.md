@@ -30,7 +30,7 @@ npm run dev
 
 ### Supabase şemasını uygulama
 
-Bkz. [`supabase/README.md`](./supabase/README.md) — migration dosyalarını CLI veya Dashboard SQL Editor ile uygulama adımları. Migration'lar `supabase/migrations/0001` → `0017` arası sırayla uygulanmalıdır.
+Bkz. [`supabase/README.md`](./supabase/README.md) — migration dosyalarını CLI veya Dashboard SQL Editor ile uygulama adımları. Migration'lar `supabase/migrations/0001` → `0018` arası sırayla uygulanmalıdır.
 
 ### Test / Staging Ortamı
 
@@ -50,9 +50,17 @@ CRON_SECRET=<herhangi bir değer, dışarıdan çağrılmıyor>
 E2E testleri ilk çalıştırıldığında (`tests/e2e/global-setup.ts`) staging'de üç kalıcı test kullanıcısı oluşturur (admin/personel/misafir rollerinde — `tests/e2e/fixtures.ts`); bu hesaplar tekrar tekrar kullanılır, her çalıştırmada silinip yeniden oluşturulmaz. Kapsam:
 
 - `appointments.spec.ts` — randevu oluşturma, kuruma bağlama, "Ertele" akışı, silme
+- `contacts.spec.ts` / `organizations.spec.ts` — kişi/kurum oluşturma, düzenleme, silme
+- `tasks.spec.ts` — görev oluşturma, tamamlama, silme
+- `user-management.spec.ts` — admin panelinden kullanıcı oluşturma, rol değiştirme, devre dışı bırakma/etkinleştirme, silme
 - `permissions.spec.ts` — admin/personel randevu silebiliyor, misafir silemiyor (rol yetkisi regresyonu)
+- `exports.spec.ts` — CSV/Excel/PDF export butonlarının gerçekten dosya indirdiğini doğrular
+- `search.spec.ts` — genel arama (⌘K) paletinin sonuç bulup ilgili kaydı açtığını doğrular
+- `pages-smoke.spec.ts` — dashboard/takvim/raporlar sayfalarının hatasız (console error'sız) yüklendiğini doğrular
 - `mobile-menu.spec.ts` — mobil hamburger menünün gerçekten ekrana kayıp geldiğini doğrular (bir Tailwind v4 güncellemesinin sessizce kırdığı gerçek bir bug'ın regresyon testi)
 - `login.spec.ts` — giriş formu doğrulaması
+
+Bu testler yazılırken gerçek bir üretim hatası da bulundu ve düzeltildi: görevler (tasks) sayfasında "Sil" butonu her role gösteriliyordu, ama RLS policy silmeyi yalnızca admin'e izin veriyordu — personel/yönetici hiçbir hata görmeden görevi "siliyor", ama işlem sessizce hiçbir şey yapmıyordu (bkz. `supabase/migrations/0018_tasks_delete_staff.sql`, randevularla aynı yetki setine çekildi: admin/yönetici/personel).
 
 Testler tek worker ile (seri) çalışır — küçük bir suite tek bir yerel `next start` sürecini paylaştığı için paralel çalıştırmak gerçek bir kazanç sağlamadan sunucu gecikmesinden kaynaklı kararsızlık (flaky test) yaratıyor.
 
@@ -152,7 +160,7 @@ src/
   store/          → zustand (yalnızca UI-local state)
   types/          → Supabase Database tipi
 supabase/
-  migrations/     → şema, RLS, trigger'lar (0001 → 0012)
+  migrations/     → şema, RLS, trigger'lar (0001 → 0018)
   seed.sql        → geliştirme için örnek veri
 docs/
   test-checklist.md        → manuel test kontrol listesi

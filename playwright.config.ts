@@ -42,6 +42,11 @@ export default defineConfig({
   workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
+  // Server actions here do a real round trip to a remote (free-tier)
+  // Supabase project plus a full RSC re-render, not an instant local mock —
+  // the default 5s expect timeout occasionally fires before that settles
+  // even though the mutation already succeeded server-side.
+  expect: { timeout: 10_000 },
   reporter: 'html',
   use: {
     baseURL: BASE_URL,
