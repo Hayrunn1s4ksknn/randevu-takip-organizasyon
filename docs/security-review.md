@@ -13,11 +13,11 @@ Bu doküman, veritabanı erişim kontrolü ve uygulama seviyesi güvenlik önlem
 
 Tüm tablolarda Row Level Security aktif (`supabase/migrations/0004_rls_policies.sql`, `0005_tasks.sql`). Genel desen:
 
-| İşlem         | Kural                                                                        |
-| ------------- | ---------------------------------------------------------------------------- |
-| SELECT        | Kimliği doğrulanmış (authenticated) her kullanıcıya açık                     |
-| INSERT/UPDATE | `current_role() in ('admin','yonetici','personel')` — `misafir` rolü yazamaz |
-| DELETE        | Yalnızca `current_role() = 'admin'`                                          |
+| İşlem         | Kural                                                                                        |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| SELECT        | Kimliği doğrulanmış (authenticated) her kullanıcıya açık                                     |
+| INSERT/UPDATE | `current_role() in ('admin','yonetici','personel')` — `misafir` rolü yazamaz                 |
+| DELETE        | Randevular/görevler: `admin`/`yönetici`/`personel`. Kullanıcı hesabı silme: yalnızca `admin` |
 
 `current_role()` SECURITY DEFINER bir Postgres fonksiyonu; `auth.uid()` üzerinden `profiles.role` değerini okuyor, böylece RLS politikaları her sorguda recursive bir `profiles` join'ine girmiyor.
 
@@ -49,5 +49,5 @@ Tüm tablolarda Row Level Security aktif (`supabase/migrations/0004_rls_policies
 
 - Row-ownership seviyesinde RLS yok (bkz. madde 2).
 - Dosya yükleme için MIME/boyut whitelisting sınırlı düzeyde; kötü niyetli dosya türü taraması yok.
-- Otomatik güvenlik testi (ör. RLS'yi ihlal etmeye çalışan bir test seti) yok; bu doküman ve `docs/test-checklist.md` manuel doğrulamaya dayanıyor.
+- Dedike bir "RLS'yi ihlal etmeye çalışan" saldırı test seti yok, ama `tests/e2e/permissions.spec.ts` en azından rol bazlı yetki farklarını (misafir vs. personel/admin silme yetkisi) her CI çalıştırmasında otomatik doğruluyor. Bu test paketi kurulurken zaten gerçek bir yetki hatası yakaladı: görevler tablosunda "Sil" butonu her role gösteriliyordu ama RLS policy'si yalnızca `admin`'e izin veriyordu (personel/yönetici tıklayınca hata almadan sessizce hiçbir şey silinmiyordu) — `supabase/migrations/0018_tasks_delete_staff.sql` ile düzeltildi. Yine de daha geniş, RLS'yi kasıtlı ihlal etmeye çalışan bir test seti (ör. `misafir` rolüyle doğrudan API'ye admin-only bir yazma isteği atıp 403/RLS reddini doğrulamak) yok.
 - Hata izleme/alerting (Sentry vb.) olmadığı için bir güvenlik olayının fark edilmesi loglara manuel bakmayı gerektiriyor.

@@ -16,7 +16,7 @@
 - Resend (transactional e-posta: randevu onayı + günlük hatırlatma cron'u)
 - `lucide-react` (ikonlar)
 - Vitest + Testing Library (unit), Playwright (E2E/manuel doğrulama)
-- Vercel (hosting + cron jobs), GitHub Actions (lint + typecheck + test + build)
+- Vercel (hosting + cron jobs), GitHub Actions (lint + typecheck + unit test + build + E2E, her push/PR'da; `main` branch protection ile PR'larda zorunlu)
 
 ## Kurulum
 
@@ -119,14 +119,14 @@ npx supabase db push --project-ref <staging-ref> --password <db-şifresi>  # sta
 - Randevular: CRUD, kurum + kişi (katılımcı) + sorumlu kullanıcı ataması, toplantı tipi/süresi, dosya yükleme (Supabase Storage), not/yorum, durum geçmişi (timeline), manuel + otomatik hatırlatma maili (Resend + Vercel Cron)
 - Görevler: CRUD, açıklama, randevuya bağlama (opsiyonel), sorumlu kullanıcı ataması, geciken görev vurgusu
 - Kişiler / Kurumlar: CRUD, arama, soft delete
-- Takvim: aylık görünüm
+- Takvim: gün/hafta/ay/ajanda görünümleri
 - Dashboard: özet istatistikler, aylık grafik, durum dağılımı, kurum dağılımı, saatlik yoğunluk, son aktiviteler, **geciken randevu/görev uyarı paneli**
 - Randevu filtreleme: durum, kurum, kişi, sorumlu kullanıcı, tarih aralığı; genel arama (⌘K)
 - Raporlar: en aktif kurumlar/personel, yıllık performans, toplantı süresi istatistikleri
 - CSV / Excel / PDF export
 - Supabase Realtime ile canlı bildirimler
 - Admin kullanıcı yönetimi: kullanıcı oluşturma, rol değiştirme, hesap devre dışı bırakma
-- KVKK aydınlatma metni sayfası (şablon — kurum bilgileriyle güncellenmeli, bkz. aşağıdaki eksikler)
+- KVKK aydınlatma metni sayfası (şablon — kurum bilgileriyle güncellenmesi gerekiyor)
 - Erişilebilirlik (klavye navigasyonu), güvenlik başlıkları (CSP/HSTS vb.), mobil responsive tasarım
 
 ## Veritabanı Yapısı (özet)
@@ -146,7 +146,7 @@ npx supabase db push --project-ref <staging-ref> --password <db-şifresi>  # sta
 | `activities`                      | Dashboard aktivite akışı (sistem tarafından yazılır)                    |
 | `auth_attempts`                   | Giriş/şifre sıfırlama rate limiting kayıtları                           |
 
-Tüm tablolarda RLS aktif; okuma genelde tüm kimliği doğrulanmış kullanıcılara açık, yazma `admin`/`yonetici`/`personel` rolleriyle sınırlı, silme yalnızca `admin`.
+Tüm tablolarda RLS aktif; okuma genelde tüm kimliği doğrulanmış kullanıcılara açık, yazma `admin`/`yonetici`/`personel` rolleriyle sınırlı. Silme de aynı üç role açık (randevular ve görevler için) — kullanıcı yönetimi (hesap silme) ise yalnızca `admin`.
 
 ## Dizin Yapısı
 
