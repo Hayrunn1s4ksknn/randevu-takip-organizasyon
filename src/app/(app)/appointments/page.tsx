@@ -10,7 +10,7 @@ import { ExportExcelButton } from '@/features/appointments/export-excel-button'
 import { NewAppointmentButton } from '@/features/appointments/new-appointment-button'
 import type { AppointmentStatus } from '@/types/database'
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 10
 
 export default async function AppointmentsPage({
   searchParams,
