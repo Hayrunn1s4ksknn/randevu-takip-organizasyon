@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react'
 import Link from 'next/link'
-import { Menu, House, Settings, Sun, Moon, AppWindow } from 'lucide-react'
+import { Menu, House, Settings, Sun, Moon, AppWindow, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { useUiStore } from '@/store/ui'
 import { toggleDarkMode } from '@/features/settings/actions'
 import { UserMenu } from '@/components/user-menu'
@@ -20,6 +20,8 @@ export function Topbar({
 }) {
   const openSearch = useUiStore((s) => s.openSearch)
   const openMobileNav = useUiStore((s) => s.openMobileNav)
+  const desktopSidebarOpen = useUiStore((s) => s.desktopSidebarOpen)
+  const toggleDesktopSidebar = useUiStore((s) => s.toggleDesktopSidebar)
   const [pending, startTransition] = useTransition()
 
   return (
@@ -31,6 +33,14 @@ export function Topbar({
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[9px] md:hidden"
         >
           <Menu size={22} />
+        </button>
+        <button
+          onClick={toggleDesktopSidebar}
+          aria-label={desktopSidebarOpen ? 'Kenar çubuğunu gizle' : 'Kenar çubuğunu göster'}
+          title={desktopSidebarOpen ? 'Kenar çubuğunu gizle' : 'Kenar çubuğunu göster'}
+          className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-[9px] text-text-secondary hover:text-text-primary md:flex"
+        >
+          {desktopSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
         </button>
         <div className="hidden shrink-0 text-base font-bold text-text-primary sm:block">{pageTitle}</div>
         <button

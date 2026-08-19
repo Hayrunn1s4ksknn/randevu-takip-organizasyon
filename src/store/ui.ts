@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+const SIDEBAR_STORAGE_KEY = 'technoscope-sidebar-open'
+
 type Toast = { id: number; message: string }
 export type ModalKey =
   | 'appointment'
@@ -37,6 +39,10 @@ interface UiState {
   openMobileNav: () => void
   closeMobileNav: () => void
 
+  desktopSidebarOpen: boolean
+  toggleDesktopSidebar: () => void
+  hydrateDesktopSidebar: () => void
+
   toasts: Toast[]
   showToast: (message: string) => void
   dismissToast: (id: number) => void
@@ -69,6 +75,29 @@ export const useUiStore = create<UiState>((set) => ({
   mobileNavOpen: false,
   openMobileNav: () => set({ mobileNavOpen: true }),
   closeMobileNav: () => set({ mobileNavOpen: false }),
+
+  // Always starts open — this must match on both the server-rendered HTML
+  // and the client's first render, or Next.js logs a hydration mismatch and
+  // (per its own warning) leaves the mismatched attributes unpatched, so the
+  // real saved value never actually applies visually. The real, possibly
+  // different saved value is applied via hydrateDesktopSidebar() below,
+  // called from a useEffect (i.e. strictly after hydration finishes) —
+  // that's a normal post-mount update, not a hydration diff, so it repaints
+  // correctly. This trades a one-frame flash of "open" for a working toggle.
+  desktopSidebarOpen: true,
+  toggleDesktopSidebar: () =>
+    set((s) => {
+      const next = !s.desktopSidebarOpen
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem(SIDEBAR_STORAGE_KEY, next ? '1' : '0')
+      }
+      return { desktopSidebarOpen: next }
+    }),
+  hydrateDesktopSidebar: () => {
+    if (typeof window === 'undefined') return
+    const stored = window.localStorage.getItem(SIDEBAR_STORAGE_KEY)
+    if (stored !== null) set({ desktopSidebarOpen: stored === '1' })
+  },
 
   toasts: [],
   showToast: (message) => {
