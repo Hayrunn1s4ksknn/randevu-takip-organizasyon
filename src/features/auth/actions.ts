@@ -35,7 +35,7 @@ export async function login(_state: ActionState, formData: FormData): Promise<Ac
     const supabase = await createClient(remember ? { rememberMaxAgeSeconds: THIRTY_DAYS } : undefined)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     await recordAuthAttempt(email, 'login', !error)
-    if (error) return { error: 'E-posta veya şifre hatalı.' }
+    if (error) return { error: 'E-posta veya şifre hatalı ya da böyle bir e-posta adresi bulunmuyor.' }
 
     const redirectTo = formData.get('redirectTo')
     const afterLogin = typeof redirectTo === 'string' && redirectTo ? redirectTo : '/dashboard'

@@ -13,5 +13,7 @@ test('shows a validation error for wrong credentials', async ({ page }) => {
   await page.getByLabel('E-posta').fill('nobody@example.com')
   await page.getByLabel('Şifre').fill('wrong-password')
   await page.getByRole('button', { name: 'Giriş yap' }).click()
-  await expect(page.getByText('E-posta veya şifre hatalı.')).toBeVisible()
+  await expect(
+    page.getByText('E-posta veya şifre hatalı ya da böyle bir e-posta adresi bulunmuyor.')
+  ).toBeVisible()
 })
