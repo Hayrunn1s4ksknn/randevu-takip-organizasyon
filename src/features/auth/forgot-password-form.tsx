@@ -8,7 +8,7 @@ export function ForgotPasswordForm() {
   const [state, action, pending] = useActionState(requestPasswordReset, undefined)
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form action={action} noValidate className="flex flex-col gap-3">
       <div>
         <label htmlFor="email" className="mb-1 block text-[12.5px] font-medium text-text-secondary">
           E-posta

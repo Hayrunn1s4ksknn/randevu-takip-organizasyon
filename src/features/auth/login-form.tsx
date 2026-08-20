@@ -8,7 +8,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
   const [state, action, pending] = useActionState(login, undefined)
 
   return (
-    <form action={action} className="flex flex-col gap-3">
+    <form action={action} noValidate className="flex flex-col gap-3">
       <input type="hidden" name="redirectTo" value={redirectTo} />
       <div>
         <label htmlFor="email" className="mb-1 block text-[12.5px] font-medium text-text-secondary">
